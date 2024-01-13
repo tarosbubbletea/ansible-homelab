@@ -1,0 +1,16 @@
+---
+- name: ssh | Disable SSH root login
+  remote_user: root
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: ^PermitRootLogin
+    line: PermitRootLogin no
+
+- name: ssh | Disable SSH password authentication
+  remote_user: root
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: ^PasswordAuthentication
+    line: PasswordAuthentication no
+  notify:
+    - Restart SSH

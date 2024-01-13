@@ -1,0 +1,17 @@
+---
+- name: prep | Get local pubkey on manager
+  become: false
+  local_action: cat ~/.ssh/id_rsa.pub
+  register: pubkey
+
+- name: "[Setup]"
+  include_tasks: setup.yml
+
+- name: "[User]"
+  include_tasks: user.yml
+
+- name: "[SSH]"
+  include_tasks: ssh.yml
+
+- name: "[Custom user]"
+  include_tasks: custom_user.yml
