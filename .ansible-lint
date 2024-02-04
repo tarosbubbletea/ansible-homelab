@@ -16,4 +16,8 @@ enable_list:
   - empty-string-compare # opt-in
   - no-log-password # opt-in
   - no-same-owner # opt-in
+<<<<<<< HEAD
   - name[prefix] # opt-in
+=======
+  - name[prefix] # opt-in
+>>>>>>> 340fd9161aa060ef396c73e87fa7324ff34e36ea
