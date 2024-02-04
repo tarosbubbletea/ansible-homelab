@@ -15,9 +15,6 @@
 
 - name: "[Custom user]"
   include_tasks: custom_user.yml
-<<<<<<< HEAD
 
 - name: "[Cron jobs]"
   include_tasks: crons.yml
-=======
->>>>>>> 340fd9161aa060ef396c73e87fa7324ff34e36ea
