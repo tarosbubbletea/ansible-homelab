@@ -3,4 +3,4 @@
   remote_user: root
   ansible.builtin.cron:
     name: "Notify webhook on server reboot"
-    job: 'curl -X POST -H "Content-Type: application/json" -d {"text":"Server rebooted"} {{ webhook_url }}'
+    job: 'curl -X POST -H "Content-Type: application/json" -d {{lookup("template", "restart.j2")}} {{ webhook_url }}'
