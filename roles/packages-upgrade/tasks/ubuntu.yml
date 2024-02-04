@@ -1,0 +1,28 @@
+---
+- name: upgrade apt packages
+  become: true
+  ansible.builtin.apt:
+    upgrade: true
+    update_cache: true
+    only_upgrade: true
+    register: aptout
+- debug: msg={{ apt.stdout.split('\n')[:-1] }}
+
+- name: check if system reboot is required
+  become: true
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+  register: reboot_required
+  notify: reboot
+
+- name: notify reboot
+  url:
+    url: "{{ webhook_url }}"
+    method: POST
+    body_format: json
+    body: "{{lookup('template', 'post.j2')}}"
+    # body: '{"content": "Reboot required on {{ inventory_hostname }}."}'
+    headers:
+      Content-Type: "application/json"
+    status_code: 204
+  when: reboot_required.stat.exists

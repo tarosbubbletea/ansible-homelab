@@ -1,0 +1,5 @@
+---
+fish_packages:
+  - "fish"
+
+omf_theme: dangerous

@@ -1,0 +1,6 @@
+---
+container_name: nginxproxymanager
+
+homer_category: system
+
+url: "http://npm.{{ host_tld }}"

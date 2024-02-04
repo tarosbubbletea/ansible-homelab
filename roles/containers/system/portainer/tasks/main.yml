@@ -1,0 +1,46 @@
+---
+- name: "[🏢] Portainer volume"
+  community.general.docker_volume:
+    volume_name: "portainer_data"
+
+- name: "[🏢] Portainer"
+  community.docker.docker_container:
+    name: portainer
+    hostname: { { container_name } }
+    image: portainer/portainer-ce:latest
+    pull: true
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "portainer_data:/data"
+    networks:
+      - name: internal
+    ports:
+      - "9002:9000"
+    labels:
+      traefik.enable: true
+      traefik.port: "9002"
+      traefik.http.routers.portainer.rule: "Host(`{{ url }}`)"
+      # traefik.http.middlewares.portainer.forwardauth.address: "http://authentik:9000/outpost.goauthentik.io/auth/traefik"
+      traefik.http.routers.whoami.middlewares: authentik@docker
+    restart_policy: unless-stopped
+    state: started
+
+- name: Check if Portainer admin user already exists
+  uri:
+    url: http://localhost:9000/api/users/administrator
+    method: GET
+    status_code: 200,404
+  register: admin_check
+  ignore_errors: true
+
+- name: Create Portainer admin user
+  uri:
+    url: http://localhost:9000/api/users/admin/init
+    method: POST
+    body_format: json
+    headers:
+      Accept: "application/json"
+    body:
+      Username: "admin"
+      Password: "{{ portainer_admin_password }}"
+  when: admin_check.status == 404

@@ -1,0 +1,8 @@
+---
+container_name: nitter
+
+homer_category: frontends
+
+url: "http://nitter.{{ host_tld }}"
+
+redis_container: redis

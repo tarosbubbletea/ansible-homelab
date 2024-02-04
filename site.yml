@@ -1,0 +1,38 @@
+---
+- name: Setup
+  hosts: all
+
+  tasks:
+    - name: set up users, dot files, etc.
+      ansible.builtin.include_role:
+        name: setup
+      tags:
+        - once
+
+    - name: Set roles
+      # handle tags passed to ansible-playbook
+      ansible.builtin.set_fact:
+        run_roles: "{{ ansible_run_tags != ['all'] and ansible_run_tags or default_roles | difference(exclude_roles | default([])) }}"
+      # if we don't pass anything then we just execute the roles in the var default_roles
+      # currently we don't have any roles with tags so this is for the future
+      tags:
+        - always
+
+    - name: Display roles
+      ansible.builtin.debug:
+        var: run_roles
+      tags:
+        - always
+
+    - name: Run roles
+      become: true
+      ansible.builtin.include_role:
+        apply:
+          tags:
+            - "{{ roles_item }}"
+        name: "{{ roles_item }}"
+      loop_control:
+        loop_var: roles_item
+      with_items: "{{ run_roles }}"
+      tags:
+        - always

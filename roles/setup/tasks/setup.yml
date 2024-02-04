@@ -1,0 +1,21 @@
+---
+- name: setup | SSH directory on root
+  remote_user: root
+  ansible.builtin.file:
+    mode: "0700"
+    path: /root/.ssh
+    state: directory
+
+- name: setup | Add local SSH pubkey into root
+  remote_user: root
+  ansible.posix.authorized_key:
+    user: root
+    state: present
+    key: "{{ pubkey }}"
+
+- name: setup | Ensure /etc/sudoers.d/ folder exists
+  remote_user: root
+  ansible.builtin.file:
+    path: /etc/sudoers.d/
+    state: directory
+    mode: "0750"

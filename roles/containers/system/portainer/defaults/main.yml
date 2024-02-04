@@ -1,0 +1,6 @@
+---
+container_name: portainer
+
+homer_category: system
+
+url: "http://portainer.{{ host_tld }}"

@@ -1,0 +1,6 @@
+---
+container_name: 4get
+
+homer_category: frontends
+
+url: "http://search.{{ host_tld }}"

@@ -1,0 +1,89 @@
+---
+- name: "[♑] sharkey network"
+  docker_network:
+    name: shonk
+    state: present
+
+- name: "[♑] sharkey-redis"
+  block:
+    - name: redis volume
+      docker_volume:
+        name: sharkey_redis
+        state: present
+    - name: redis
+      docker_container:
+        name: sharkey-redis
+        hostname: sharkey-redis
+        image: redis:alpine
+        pull: true
+        restart_policy: unless-stopped
+        state: started
+        ports:
+          - "6379:6379"
+        volumes:
+          - sharkey_redis:/data
+        networks:
+          - name: shonk
+        healthcheck:
+          test: "redis-cli ping"
+          interval: 5s
+          retries: 20
+
+- name: "[♑] sharkey-postgres"
+  block:
+    - name: postgres volume
+      docker_volume:
+        name: sharkey_postgres
+        state: present
+    - name: postgres
+      docker_container:
+        name: sharkey-postgres
+        hostname: sharkey-postgres
+        image: postgres:alpine
+        pull: true
+        restart_policy: unless-stopped
+        state: started
+        ports:
+          - "5432:5432"
+        volumes:
+          - sharkey_postgres:/var/lib/postgresql/data
+        environment:
+          POSTGRES_PASSWORD: { { POSTGRES_PASSWORD } }
+          POSTGRES_USER: { { POSTGRES_USER } }
+          POSTGRES_DB: { { POSTGRES_DB } }
+          DATABASE_URL: postgres://{{ POSTGRES_USER }}:{{ POSTGRES_PASSWORD }}@postgres:5432/{{ POSTGRES_DB }}
+        healthcheck:
+          test: "pg_isready -U {{POSTGRES_USER}} -d {{POSTGRES_DB}}"
+          interval: 5s
+          retries: 20
+        networks:
+          - name: shonk
+
+- name: "[♑] sharkey"
+  block:
+    - name: sharkey volume
+      docker_volume:
+        name: sharkey_volume
+        state: present
+    - name: container
+      docker_container:
+        name: sharkey
+        hostname: sharkey
+        image: git.joinsharkey.org/sharkey/sharkey:latest
+
+        ports:
+          - 61211:61211
+        volumes:
+          - sharkey_volume/files:/sharkey/files
+          - sharkey_volume/config:/sharkey/.config:ro
+        networks:
+          - name: shonk
+          - name: internal
+
+        labels:
+          traefik.enable: true
+          traefik.port: "61211"
+          traefik.http.routers.sharkey.rule: "Host(`{{ url }}`)"
+
+        restart_policy: unless-stopped
+        state: started

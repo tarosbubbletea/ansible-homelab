@@ -1,0 +1,63 @@
+---
+- name: Install fish
+  become: true
+  ansible.builtin.apt:
+    name: "{{ fish_packages }}"
+    state: present
+    update_cache: true
+
+- name: Configure ~/.config/fish/config.fish
+  ansible.builtin.copy:
+    src: config.fish
+    dest: "/home/{{ username }}/.config/fish/config.fish"
+    mode: "0600"
+    owner: "{{ username }}"
+    force: no
+
+- name: Check for OMF
+  ansible.builtin.stat:
+    path: /home/{{ username }}/.local/share/omf
+  register: omf
+
+- name: Download OMF
+  get_url:
+    url: https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install dest=/tmp/omf-install
+  when: omf.stat.exists == false
+
+- name: Install OMF
+  ansible.builtin.shell: fish /tmp/omf-install --noninteractive
+  when: omf.stat.exists == false
+
+- name: Configure ls colors
+  ansible.builtin.copy:
+    src: lscolors
+    dest: "/home/{{ username }}/.lscolors"
+    mode: "0600"
+    owner: "{{ username }}"
+    force: no
+
+- name: Check OMF theme
+  ansible.builtin.stat:
+    path: /home/{{ username }}/.local/share/omf/themes/{{ omf_theme }}
+  register: omf_theme
+
+- name: Install OMF theme
+  ansible.builtin.shell: fish -c "omf install {{ omf_theme }}"
+  when: omf_theme.stat.exists == false
+
+- name: Set OMF theme
+  ansible.builtin.shell: fish -c "omf theme {{ omf_theme }}"
+  when: omf_theme.stat.exists == true
+
+- name: Configure OMF theme
+  ansible.builtin.copy:
+    src: fish_prompt.fish
+    dest: "/home/{{ username }}/.config/fish/functions/fish_prompt.fish"
+    mode: "0600"
+    owner: "{{ username }}"
+    force: yes
+
+- name: clean OMF installer
+  ansible.builtin.file:
+    path: /tmp/omf-install
+    state: absent

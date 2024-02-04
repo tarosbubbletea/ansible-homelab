@@ -1,0 +1,16 @@
+---
+- name: "[📶] cloudflared-web"
+  community.docker.docker_container:
+    name: cloudflared-web
+    hostname: cloudflared-web
+    image: wisdomsky/cloudflared-web
+    pull: true
+    networks:
+      - name: internal
+    restart_policy: unless-stopped
+    state: started
+    ports:
+      - target: 14333 # required so you can access the WebUI from a browser if you're not using network_mode: host
+        published: 14333
+        protocol: tcp
+    # won't be exposing this to the wide network / no traefik settings here

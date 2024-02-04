@@ -1,0 +1,53 @@
+---
+- name: "[🔅] nitter-redis volume"
+  community.docker.docker_volume:
+    volume_name: nitter_redis
+
+- name: "[🔅] nitter network"
+  community.docker.docker_network:
+    name: nitter
+
+- name: "[🔅] nitter volume"
+  community.docker.docker_volume:
+    volume_name: nitter_data
+
+- name: "[🔅] nitter config"
+  ansible.builtin.template:
+    src: nitter.conf.j2
+    dest: /var/lib/docker/volumes/nitter_data/nitter.conf
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: "[🔅] nitter-redis"
+  community.docker.docker_container:
+    name: nitter-redis
+    hostname: nitter-redis
+    image: redis:alpine
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - nitter_redis:/data
+    networks:
+      - name: nitter
+    restart_policy: unless-stopped
+
+- name: "[🔅] nitter (remember to provision guest accounts.)"
+  community.docker.docker_container:
+    name: nitter
+    hostname: { { container_name } }
+    image: tarobubbletea/nitter-guest:latest
+    pull: true
+    volumes:
+      - nitter_data/nitter.conf:/src/nitter.conf
+      - nitter_data/guest_accounts.json:/src/guest_accounts.json:ro
+    networks:
+      - name: nitter
+      - name: internal
+    ports:
+      - "61200:61200"
+    labels:
+      traefik.enable: true
+      traefik.port: "61200"
+      traefik.http.routers.nitter.rule: "Host(`{{ url }}`)"
+    restart_policy: unless-stopped
+    status: started

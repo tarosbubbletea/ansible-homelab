@@ -1,0 +1,61 @@
+{
+    "ansible.python.interpreterPath": "/bin/python3",
+    "folder-color.pathColors": [
+        {
+            "folderPath": "ansible/roles/containers/frontends/nitter/",
+            "color": "foldercolorizer.PaleTaupe"
+        },
+        {
+            "folderPath": "ansible/roles/containers/frontends/4get/",
+            "color": "foldercolorizer.LawnGreen"
+        },
+        {
+            "folderPath": "ansible/roles/containers/frontends/sharkey/",
+            "color": "foldercolorizer.SkyBlue"
+        },
+        {
+            "folderPath": "ansible/roles/containers/system/cloudflared/",
+            "color": "foldercolorizer.CarrotOrange"
+        },
+        {
+            "folderPath": "ansible/roles/containers/system/portainer/",
+            "color": "foldercolorizer.LightSteelBlue"
+        },
+        {
+            "folderPath": "ansible/roles/containers/system/traefik/",
+            "color": "foldercolorizer.CadetBlue"
+        },
+        {
+            "folderPath": "ansible/roles/docker/",
+            "color": "foldercolorizer.LightSkyBlue"
+        },
+        {
+            "folderPath": "ansible/roles/setup/",
+            "color": "foldercolorizer.PureGold"
+        },
+        {
+            "folderPath": "ansible/roles/packages-misc/",
+            "color": "foldercolorizer.PureGold"
+        },
+        {
+            "folderPath": "ansible/roles/packages-checkup/",
+            "color": "foldercolorizer.PureGold"
+        },
+        {
+            "folderPath": "ansible/roles/dotfiles/",
+            "color": "foldercolorizer.PureGold"
+        },
+        {
+            "folderPath": "ansible/roles/containers/",
+            "color": "foldercolorizer.Platinum"
+        },
+        {
+            "folderPath": "ansible/roles/",
+            "color": "foldercolorizer.FireBrick"
+        },
+        {
+            "folderPath": "ansible/roles/containers/system/authentik/",
+            "color": "foldercolorizer.LightSalmon"
+        }
+    ]
+}
