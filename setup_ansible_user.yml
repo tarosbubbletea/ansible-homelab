@@ -1,0 +1,55 @@
+---
+- name: configure system (set up ansible)
+  gather_facts: false
+  become: true
+  become_user: root
+  remote_user: root
+  vars:
+    remote_user: root
+    ansible_user: root
+    #edit as required
+    #ansible_password:
+  hosts: all
+  tags:
+    - setup
+
+  tasks:
+    - name: create ansible user
+      ansible.builtin.user:
+        name: ansible
+        shell: /bin/bash
+        home: /home/ansible
+        createhome: true
+        state: present
+        password: "{{ '%s' | format(ansible2_password) | password_hash('sha512') }}"
+        update_password: on_create
+      tags:
+        - once
+
+    - name: add ansible user to sudoers
+      ansible.builtin.copy:
+        content: "ansible ALL=(ALL) NOPASSWD: ALL"
+        dest: /etc/sudoers.d/ansible
+        mode: "0440"
+      tags:
+        - once
+
+    - name: create ssh dir
+      ansible.builtin.file:
+        path: /home/ansible/.ssh
+        state: directory
+        owner: ansible
+        group: ansible
+        mode: "0700"
+      tags:
+        - once
+
+    - name: add (local) pubkey to ansible user authorized_keys
+      ansible.builtin.copy:
+        src: ~/.ssh/id_rsa.pub
+        dest: /home/ansible/.ssh/authorized_keys
+        owner: ansible
+        group: ansible
+        mode: "0700"
+      tags:
+        - once

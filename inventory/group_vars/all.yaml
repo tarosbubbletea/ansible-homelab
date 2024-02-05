@@ -9,14 +9,15 @@ main_password: !vault |
   3762323534666539300a346530313365323037356537616461616365666262636537343065376361
   3061
 main_shell: /usr/bin/fish
+omf_theme_name: dangerous
 docker_dir: /opt/docker/data
 host_tld: nanachi.store
-username: { { main_user } }
+username: "{{ main_user }}"
 
 default_roles:
-  # - setup
   - packages-upgrade
   - packages-misc
+  - setup
   - dotfiles/fish
   - docker
   - containers/system/portainer
@@ -28,9 +29,9 @@ default_roles:
   - containers/frontends/4get
   - containers/frontends/sharkey
 
-ansible_user: ansible
+# ansible_user: ansible
 
-ansible_password: !vault |
+ansible2_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256
   64636538656263653030656639646564653432373232666538666264303139633164353261353762
   3538376265383433303431326639376462376332626264330a303838353537303633326566353264

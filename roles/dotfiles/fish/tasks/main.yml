@@ -2,11 +2,12 @@
 - name: Install fish
   become: true
   ansible.builtin.apt:
-    name: "{{ fish_packages }}"
+    name: fish
     state: present
     update_cache: true
 
 - name: Configure ~/.config/fish/config.fish
+  become: true
   ansible.builtin.copy:
     src: config.fish
     dest: "/home/{{ username }}/.config/fish/config.fish"
@@ -15,20 +16,26 @@
     force: no
 
 - name: Check for OMF
+  become: true
   ansible.builtin.stat:
     path: /home/{{ username }}/.local/share/omf
   register: omf
 
 - name: Download OMF
+  become: true
   get_url:
-    url: https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install dest=/tmp/omf-install
+    url: https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install
+    dest: /tmp/omf-install
   when: omf.stat.exists == false
 
 - name: Install OMF
+  become: true
+  become_user: "{{ username }}"
   ansible.builtin.shell: fish /tmp/omf-install --noninteractive
   when: omf.stat.exists == false
 
 - name: Configure ls colors
+  become: true
   ansible.builtin.copy:
     src: lscolors
     dest: "/home/{{ username }}/.lscolors"
@@ -37,19 +44,25 @@
     force: no
 
 - name: Check OMF theme
+  become: true
   ansible.builtin.stat:
-    path: /home/{{ username }}/.local/share/omf/themes/{{ omf_theme }}
+    path: /home/{{ username }}/.local/share/omf/themes/{{ omf_theme_name }}
   register: omf_theme
 
 - name: Install OMF theme
-  ansible.builtin.shell: fish -c "omf install {{ omf_theme }}"
+  become: true
+  become_user: "{{ username }}"
+  ansible.builtin.shell: fish -c "omf install {{ omf_theme_name }}"
   when: omf_theme.stat.exists == false
 
 - name: Set OMF theme
-  ansible.builtin.shell: fish -c "omf theme {{ omf_theme }}"
+  become: true
+  become_user: "{{ username }}"
+  ansible.builtin.shell: fish -c "omf theme {{ omf_theme_name }}"
   when: omf_theme.stat.exists == true
 
 - name: Configure OMF theme
+  become: true
   ansible.builtin.copy:
     src: fish_prompt.fish
     dest: "/home/{{ username }}/.config/fish/functions/fish_prompt.fish"
@@ -58,6 +71,7 @@
     force: yes
 
 - name: clean OMF installer
+  become: true
   ansible.builtin.file:
     path: /tmp/omf-install
     state: absent

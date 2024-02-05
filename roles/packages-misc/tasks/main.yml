@@ -1,12 +1,15 @@
 ---
 - name: install stuff
+  become: true
   ansible.builtin.apt:
     name: "{{ item }}"
     state: present
   loop:
+    - sudo
     - git
     - curl
     - unzip
     - wget
     - zip
+    - fish
   when: "ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'"

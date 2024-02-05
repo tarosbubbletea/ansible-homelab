@@ -1,0 +1,11 @@
+---
+- name: notify_reboot
+  ansible.builtin.uri:
+    url: "{{ webhook_url }}"
+    method: POST
+    body_format: json
+    body: "{{lookup('template', 'post.j2')}}"
+    # body: '{"content": "Reboot required on {{ inventory_hostname }}."}'
+    headers:
+      Content-Type: "application/json"
+    status_code: 204

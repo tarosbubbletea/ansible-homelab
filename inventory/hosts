@@ -1,2 +1,2 @@
-[apparatus]
-192.168.1.215
+[nodes]
+node_1 ansible_host=192.168.1.122

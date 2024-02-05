@@ -6,7 +6,7 @@
 - name: "[🔅] 4get"
   community.docker.docker_container:
     name: 4get
-    hostname: { { container_name } }
+    hostname: "{ { container_name } }"
     image: luuul/4get:latest
     pull: true
     networks:

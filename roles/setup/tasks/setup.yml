@@ -1,21 +1,38 @@
 ---
 - name: setup | SSH directory on root
-  remote_user: root
+  become: true
   ansible.builtin.file:
     mode: "0700"
     path: /root/.ssh
     state: directory
 
 - name: setup | Add local SSH pubkey into root
-  remote_user: root
-  ansible.posix.authorized_key:
-    user: root
+  become: true
+  ansible.builtin.lineinfile:
+    path: /root/.ssh/authorized_keys
+    line: "{{ pubkey.stdout }}"
+    create: yes
     state: present
-    key: "{{ pubkey }}"
 
 - name: setup | Ensure /etc/sudoers.d/ folder exists
-  remote_user: root
+  become: true
   ansible.builtin.file:
     path: /etc/sudoers.d/
     state: directory
     mode: "0750"
+
+- name: ssh | Disable SSH root login
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: ^PermitRootLogin
+    line: PermitRootLogin no
+
+- name: ssh | Disable SSH password authentication
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: ^PasswordAuthentication
+    line: PasswordAuthentication no
+  notify:
+    - Restart SSH

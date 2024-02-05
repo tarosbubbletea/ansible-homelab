@@ -1,13 +1,13 @@
 ---
-- name: user | Make user {{ main_user }}
+- name: user | Configure {{ main_user }}
   become: true
   register: user_created
   ansible.builtin.user:
-    name: { { main_user } }
-    shell: { { main_shell } }
-    password: "{{ main_password | password_hash('sha512') }}"
+    name: "{{main_user}}"
+    shell: "{{main_shell}}"
+    password: "{{ '%s' | format(main_password) | password_hash('sha512') }}"
     update_password: on_create
-    group: sudo
+    groups: sudo
     append: true
     state: present
 
@@ -20,18 +20,19 @@
     path: "{{ user_created.home }}/.ssh"
     state: directory
 
-- name: user | Add local SSH pubkey into {{ main_user }}
+- name: user | Add local SSH pubkey into {{main_user}}
   become: true
-  ansible.posix.authorized_key:
-    user: "{{ main_user }}"
+  ansible.builtin.lineinfile:
+    path: "{{user_created.home}}/.ssh/authorized_keys"
+    line: "{{ pubkey.stdout }}"
+    create: yes
     state: present
-    key: "{{ pubkey }}"
 
 - name: user | No password sudo
   become: true
   ansible.builtin.template:
-    src: sudoers.j2
-    dest: /etc/sudoers.d/{{ main_user }}
+    src: sudoers_mainuser.j2
+    dest: "/etc/sudoers.d/{{ main_user }}"
     owner: root
     group: root
     mode: "0440"

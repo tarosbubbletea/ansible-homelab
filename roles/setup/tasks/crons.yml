@@ -1,6 +1,19 @@
 ---
+- name: cron | copy script
+  become: true
+  ansible.builtin.template:
+    src: crontasks.j2
+    dest: /home/{{main_user}}/cron.sh
+    owner: "{{main_user}}"
+    group: "{{main_user}}"
+    mode: 0755
+
 - name: cron | Notify webhook on server reboot
-  remote_user: root
+  become: true
+  become_user: root
   ansible.builtin.cron:
     name: "Notify webhook on server reboot"
-    job: 'curl -X POST -H "Content-Type: application/json" -d {{lookup("template", "restart.j2")}} {{ webhook_url }}'
+    state: present
+    special_time: "reboot"
+    job: "/home/{{main_user}}/cron.sh {{ webhook_url }}"
+# curl -X POST -H "Content-Type: application/json" -d "{{lookup("template", "restart.j2")}}"

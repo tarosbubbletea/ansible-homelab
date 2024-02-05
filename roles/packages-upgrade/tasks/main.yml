@@ -1,3 +1,19 @@
 ---
-- include_tasks: ubuntu.yml
-  when: "ansible_distribution == 'Ubuntu' || ansible_distribution == 'Debian'"
+- name: upgrade apt packages
+  become: true
+  ansible.builtin.apt:
+    upgrade: true
+    update_cache: true
+    only_upgrade: true
+    # register: aptout
+
+- name: check if system reboot is required
+  become: true
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+  register: reboot_required
+
+- name: if reboot is required then notify
+  debug: msg="Reboot required"
+  when: reboot_required.stat.exists
+  notify: notify_reboot

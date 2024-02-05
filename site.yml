@@ -1,14 +1,12 @@
 ---
 - name: Setup
+  vars:
+    #should be able to ssh without login though?
+    ansible_user: ansible
+    ansible_password: "{{ansible2_password}}"
   hosts: all
 
   tasks:
-    - name: set up users, dot files, etc.
-      ansible.builtin.include_role:
-        name: setup
-      tags:
-        - once
-
     - name: Set roles
       # handle tags passed to ansible-playbook
       ansible.builtin.set_fact:
@@ -25,7 +23,6 @@
         - always
 
     - name: Run roles
-      become: true
       ansible.builtin.include_role:
         apply:
           tags:
