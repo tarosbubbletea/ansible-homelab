@@ -10,11 +10,11 @@
 - name: Deploy nginxproxymanager container
   community.docker.docker_container:
     name: nginxproxymanager
-    hostname: { { container_name } }
+    hostname: "{ { container_name } }"
     image: "jc21/nginx-proxy-manager:latest"
     pull: true
     volumes:
-      - "nginxpm_data:/app/data"
+      - "nginxpm_data:/data"
       - "letsencrypt:/etc/letsencrypt"
     networks:
       - name: internal
@@ -23,4 +23,10 @@
       - "81:81"
       - "443:443"
     restart_policy: unless-stopped
-    status: started
+    state: started
+
+- name: fix permissions
+  shell: docker exec nginxproxymanager chown -R 777:777 /data
+
+- name: chmod 777
+  shell: docker exec nginxproxymanager chmod -R 777 /data

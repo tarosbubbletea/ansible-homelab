@@ -1,1 +1,3 @@
 ansible_pwd
+cert.key
+cert.pem

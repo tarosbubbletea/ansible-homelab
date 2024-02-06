@@ -8,10 +8,34 @@
   community.docker.docker_volume:
     volume_name: "traefik_data"
 
+- name: copy certs
+  block:
+    - name: create certs folder
+      file:
+        path: /tmp/certs
+        state: directory
+    - name: copy cert.pem
+      copy:
+        src: cert.pem
+        dest: /tmp/certs/cert.pem
+    - name: copy cert.key
+      copy:
+        src: cert.key
+        dest: /tmp/certs/cert.key
+
+- name: put in docker
+  block:
+    - name: create certs folder
+      shell: docker exec traefik mkdir -p /etc/traefik/certs
+    - name: copy cert.pem
+      shell: docker cp /tmp/certs/cert.pem traefik:/etc/traefik/certs/cert.pem
+    - name: copy cert.key
+      shell: docker cp /tmp/certs/cert.key traefik:/etc/traefik/certs/cert.key
+
 - name: "[📶] Traefik"
   community.docker.docker_container:
-    name: traefik
-    hostname: traefik
+    name: "traefik"
+    hostname: "traefik"
     image: "traefik:v2.10"
     pull: true
     volumes:
@@ -23,11 +47,15 @@
       - "80:80"
       - "443:443"
       - "8080:8080"
-    environment:
-      TRAEFIK_API: true
-      TRAEFIK_API_DASHBOARD: true
-      TRAEFIK_PROVIDERS_DOCKER: true
-      TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT: false
-      TRAEFIK_PROVIDERS_DOCKER_NETWORK: internal
+    command: "--accesslog=true --api.insecure=true --api.dashboard=true --entrypoints.web.address=:80 --entrypoints.websecure.address=:443 --providers.docker=true --providers.docker.endpoint=unix:///var/run/docker.sock --providers.docker.exposedByDefault=false --providers.docker.network=internal"
+    labels:
+      traefik.enable: "false"
+      traefik.http.routers.api.rule: Host(`{{url}}`)
+      traefik.http.routers.api.service: "api@internal"
+      traefik.http.routers.api.entrypoints: web
+      # traefik.http.routers.api.middlewares: "authentik@docker"
+    env:
+      TRAEFIK_PROVIDERS_HTTP_TLS_CERT: "/etc/traefik/certs/cert.pem"
+      TRAEFIK_PROVIDERS_HTTP_TLS_KEY: "/etc/traefik/certs/key.pem"
     restart_policy: unless-stopped
-    status: started
+    state: started

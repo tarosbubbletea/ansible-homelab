@@ -1,28 +1,102 @@
----
-- name: "[📶] Authentik"
+- name: authentik network
+  docker_network:
+    name: authentik
+    state: present
+
+- name: authentik data
+  docker_volume:
+    name: authentik_data
+    state: present
+
+- name: authentik-redis
+  block:
+    - name: redis volume
+      docker_volume:
+        name: authentik_redis
+        state: present
+    - name: redis
+      docker_container:
+        name: authentik-redis
+        hostname: authentik-redis
+        image: redis:alpine
+        pull: true
+        restart_policy: unless-stopped
+        state: started
+        volumes:
+          - authentik_redis:/data
+        networks:
+          - name: authentik
+        healthcheck:
+          test: "redis-cli ping"
+          interval: 5s
+          retries: 20
+
+- name: authentik-postgres
+  block:
+    - name: postgres volume
+      docker_volume:
+        name: authentik_postgres
+        state: present
+    - name: postgres
+      docker_container:
+        name: authentik-postgres
+        hostname: authentik-postgres
+        image: postgres:alpine
+        pull: true
+        restart_policy: unless-stopped
+        state: started
+        volumes:
+          - authentik_postgres:/var/lib/postgresql/data
+        env:
+          POSTGRES_PASSWORD: "{{ POSTGRES_PASSWORD }}"
+          POSTGRES_USER: "{{ POSTGRES_USER }}"
+          POSTGRES_DB: "{{ POSTGRES_DB }}"
+          DATABASE_URL: "postgres://{{ POSTGRES_USER }}:{{ POSTGRES_PASSWORD }}@postgres:5432/{{ POSTGRES_DB }}"
+        healthcheck:
+          test: "pg_isready -U {{POSTGRES_USER}} -d {{POSTGRES_DB}}"
+          interval: 5s
+          retries: 20
+        networks:
+          - name: authentik
+
+- name: "[a] authentik"
   community.docker.docker_container:
-    name: authentik-proxy
-    hostname: { { container_name } }
-    image: ghcr.io/goauthentik/proxy
+    name: authentik
+    hostname: authentik
+    image: ghcr.io/goauthentik/server:2023.10.7
     pull: true
-    networks:
-      - name: internal
-    ports:
-      - 9000:9000
-      - 9443:9443
-    environment:
-      AUTHENTIK_HOST: { { url } }
-      AUTHENTIK_INSECURE: "false"
-      AUTHENTIK_BOOTSTRAP_TOKEN: { { authentik_secret } }
-      AUTHENTIK_BOOTSTRAP_EMAIL: { { authentik_email } }
-      AUTHENTIK_BOOTSTRAP_PASSWORD: { { authentik_password } }
-    labels:
-      traefik.enable: true
-      traefik.port: 9000
-      traefik.http.routers.authentik.rule: Host(`{{url}}`) && PathPrefix(`/outpost.goauthentik.io/`)
-      # `authentik-proxy` refers to the service name in the compose file.
-      traefik.http.middlewares.authentik.forwardauth.address: http://authentik-proxy:9000/outpost.goauthentik.io/auth/traefik
-      traefik.http.middlewares.authentik.forwardauth.trustForwardHeader: true
-      traefik.http.middlewares.authentik.forwardauth.authResponseHeaders: X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version
     restart_policy: unless-stopped
     state: started
+    ports:
+      - "9000:9000"
+    volumes:
+      - authentik_data:/media
+    env:
+      AUTHENTIK_REDIS__HOST: "authentik-redis"
+      AUTHENTIK_POSTGRESQL__PASSWORD: "{{ POSTGRES_PASSWORD }}"
+      AUTHENTIK_POSTGRESQL__HOST: "authentik-postgres"
+      AUTHENTIK_POSTGRESQL__USER: "{{ POSTGRES_USER }}"
+      AUTHENTIK_POSTGRESQL__NAME: "{{ POSTGRES_DB }}"
+      # AUTHENTIK_SECRET_KEY: "{{ authentik_secret_key }}"
+      # AUTHENTIK_BOOTSTRAP_PASSWORD: "{{ AUTHENTIK_BOOTSTRAP_PASSWORD }}"
+      # AUTHENTIK_BOOTSTRAP_TOKEN: "{{ AUTHENTIK_BOOTSTRAP_TOKEN }}"
+      AUTHENTIK_HOSTNAME: "authentik.{{host_tld}}"
+      # AUTHENTIK_WEBHOOK_URL: "{{ AUTHENTIK_WEBHOOK_URL }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.authentik.rule: Host(`authentik.{{host_tld}}`)
+      # traefik.http.routers.authentik.tls: "true"
+      # traefik.http.routers.authentik.tls.certresolver: "letsencrypt"
+      traefik.http.routers.authentik.entrypoints: web
+      traefik.http.routers.authentik.middlewares: "authentik"
+      traefik.http.middlewares.authentik.forwardauth.address: "http://authentik:9000/outpost.goauthentik.io/auth/traefik"
+      traefik.http.middlewares.authentik.forwardauth.trustforwardheader: "true"
+      traefik.http.middlewares.authentik.forwardauth.authresponseheaders: "X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version"
+
+    networks:
+      - name: authentik
+      - name: internal
+    healthcheck:
+      test: "curl --fail http://authentik:9000/healthz"
+      interval: 5s
+      retries: 20

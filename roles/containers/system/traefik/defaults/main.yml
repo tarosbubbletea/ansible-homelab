@@ -1,0 +1,6 @@
+---
+container_name: traefik
+
+homer_category: system
+
+url: "traefik.{{ host_tld }}"

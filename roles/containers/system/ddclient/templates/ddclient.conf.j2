@@ -1,0 +1,8 @@
+# Replace text in login, password, zone, and domain
+protocol=cloudflare
+use=web, web=api64.ipify.org
+ssl=yes
+login={{cloudflare_email}}
+password={{cloudflare_apikey}}
+zone={{host_tld}}
+{{host_tld}}

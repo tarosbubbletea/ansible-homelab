@@ -2,12 +2,13 @@
 - name: "[🏢] Portainer volume"
   community.general.docker_volume:
     volume_name: "portainer_data"
+    state: present
 
 - name: "[🏢] Portainer"
   community.docker.docker_container:
-    name: portainer
+    name: "portainer"
     hostname: "{ { container_name } }"
-    image: portainer/portainer-ce:latest
+    image: "portainer/portainer-ce:latest"
     pull: true
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -17,30 +18,34 @@
     ports:
       - "9002:9000"
     labels:
-      traefik.enable: true
-      traefik.port: "9002"
-      traefik.http.routers.portainer.rule: "Host(`{{ url }}`)"
+      traefik.enable: "true" #supposed to be a string for some reason???
+      traefik.http.services.portainer.loadbalancer.server.port: "9000"
+      traefik.http.routers.portainer.rule: Host(`{{url}}`)
+      traefik.http.routers.portainer.entrypoints: web
       # traefik.http.middlewares.portainer.forwardauth.address: "http://authentik:9000/outpost.goauthentik.io/auth/traefik"
-      traefik.http.routers.whoami.middlewares: authentik@docker
+      # traefik.http.routers.whoami.middlewares: authentik@docker
     restart_policy: unless-stopped
     state: started
 
-- name: Check if Portainer admin user already exists
-  uri:
-    url: http://localhost:9000/api/users/administrator
-    method: GET
-    status_code: 200,404
-  register: admin_check
-  ignore_errors: true
+- name: debug msg
+  debug:
+    msg: "---- REMINDER ---- Portainer is running at localhost:9002 but 9000 for exposing it"
+# - name: Check if Portainer admin user already exists
+#   uri:
+#     url: "http://{{url}}:9002/api/users/administrator"
+#     method: GET
+#     status_code: 200,404
+#   register: admin_check
+#   ignore_errors: true
 
-- name: Create Portainer admin user
-  uri:
-    url: http://localhost:9000/api/users/admin/init
-    method: POST
-    body_format: json
-    headers:
-      Accept: "application/json"
-    body:
-      Username: "admin"
-      Password: "{{ portainer_admin_password }}"
-  when: admin_check.status == 404
+# - name: Create Portainer admin user
+#   uri:
+#     url: "http://{{url}}:9002/api/users/admin/init"
+#     method: POST
+#     body_format: json
+#     headers:
+#       Accept: "application/json"
+#     body:
+#       Username: "admin"
+#       Password: "{{ portainer_admin_password }}"
+#   when: admin_check.status == 404

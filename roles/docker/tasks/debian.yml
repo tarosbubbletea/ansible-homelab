@@ -44,10 +44,10 @@
         - "{{ username }}"
         - "{{ ansible_user }}"
 
-    - name: Install Python docker dependency
-      ansible.builtin.pip:
-        name: docker
-        state: present
+    # - name: Install Python docker dependency
+    #   ansible.builtin.pip:
+    #     name: docker
+    #     state: present
 
     - name: Make sure that the docker folders exists
       ansible.builtin.file:
@@ -56,3 +56,8 @@
         group: "{{ username }}"
         mode: "0755"
         state: directory
+
+    - name: Make internal docker network
+      community.general.docker_network:
+        name: internal
+        state: present

@@ -1,0 +1,36 @@
+---
+- name: docker volume
+  community.docker.docker_volume:
+    volume_name: "ddclient"
+    state: present
+
+- name: docker container
+  community.docker.docker_container:
+    name: ddclient
+    hostname: ddclient
+    image: lscr.io/linuxserver/ddclient:latest
+    pull: true
+    restart_policy: unless-stopped
+    state: started
+    env:
+      TZ: "America/Santiago"
+    volumes:
+      - ddclient:/config
+    networks:
+      - name: internal
+    healthcheck:
+      test: "pgrep ddclient"
+      interval: 5s
+      retries: 20
+
+- name: store config temporarily
+  template:
+    src: ddclient.conf.j2
+    dest: /tmp/ddclient.conf
+    mode: 0600
+
+- name: copy config to container
+  shell: docker cp /tmp/ddclient.conf ddclient:/config/ddclient.conf
+
+- name: fix permissions
+  shell: docker exec ddclient chown -R abc:abc /config
