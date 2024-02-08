@@ -3,9 +3,10 @@
 HOSTNAME=$(hostname)
 CURRENT_DATE=$(date --iso-8601=seconds)
 # Retrieve the last 5 lines from journalctl and escape characters to make it JSON-compatible
-JOURNAL_OUTPUT=$(journalctl -r -n 5 -u systemd-logind | sed ':a;N;$!ba;s/\r//g;s/\n/\\n/g;s/\t/\\t/g;s/"/\\"/g')
+JOURNAL_OUTPUT=$(journalctl -p err -b -1 | grep -v login | tail -5 | sed ':a;N;$!ba;s/\r//g;s/\n/\\n/g;s/\t/\\t/g;s/"/\\"/g')
 
-json_payload=$(cat <<EOF    
+json_payload=$(
+  cat <<EOF
 {
       "content": "<@!329445869948502026> <@!417817953954824193>",
       "embeds": [
