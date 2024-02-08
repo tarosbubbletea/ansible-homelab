@@ -1,0 +1,5 @@
+---
+- name: restart ddclient
+  community.docker.docker_container:
+    name: ddclient
+    restart: yes

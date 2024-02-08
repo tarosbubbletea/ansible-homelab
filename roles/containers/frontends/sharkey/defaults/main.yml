@@ -2,4 +2,4 @@
 POSTGRES_PASSWORD: example-misskey-pass
 POSTGRES_USER: example-misskey-user
 POSTGRES_DB: misskey
-url: http://{{host_tld}}
+url: "{{host_tld}}"

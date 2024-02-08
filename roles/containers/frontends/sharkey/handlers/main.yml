@@ -1,0 +1,5 @@
+---
+- name: restart sharkey
+  community.docker.docker_container:
+    name: sharkey
+    restart: yes

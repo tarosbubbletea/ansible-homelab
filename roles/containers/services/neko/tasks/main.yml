@@ -1,0 +1,45 @@
+---
+# - name: "[🔅] neko volume"
+#   community.docker.docker_volume:
+#     volume_name: "neko"
+
+- name: "[🔅] neko"
+  community.docker.docker_container:
+    name: neko
+    hostname: "{{container_name}}"
+    image: m1k1o/neko:firefox
+    shm_size: "2GB"
+    pull: true
+    networks:
+      - name: internal
+    published_ports:
+      # - "8080:8080"
+      - "52000-52100:52000-52100/udp"
+
+    env:
+      NEKO_SCREEN: "1920x1080@30"
+      NEKO_IMPLICIT_CONTROL: "true"
+      NEKO_HWENC: "vaapi"
+      NEKO_PASSWORD: "neko"
+      NEKO_PASSWORD_ADMIN: "admin"
+      NEKO_EPR: "52000-52100"
+      NEKO_ICELITE: "1"
+
+    # volumes:
+    # - /etc/letsencrypt/live/domain.tld:/etc/4get/certs
+    # - fourget/banner:/var/www/html/4get/banner
+    # - fourget/captcha:/var/www/html/4get/data/captcha
+    # - fourget/icons:/var/www/html/4get/icons
+    # - fourget/themes:/var/www/html/4get/static/themes
+    # - fourget/favicon.ico:/var/www/html/4get/favicon.ico
+    # - fourget/data:/var/www/html/4get/data
+
+    labels:
+      traefik.enable: "true" #supposed to be a string for some reason???
+      traefik.http.services.neko.loadbalancer.server.port: "8080"
+      traefik.http.routers.neko.rule: Host(`{{url}}`)
+      traefik.http.routers.neko.entrypoints: web
+      # traefik.http.middlewares.portainer.forwardauth.address: "http://authentik:9000/outpost.goauthentik.io/auth/traefik"
+      # traefik.http.routers.whoami.middlewares: authentik@docker
+    restart_policy: unless-stopped
+    state: started

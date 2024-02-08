@@ -3,9 +3,9 @@
   become: true
   ansible.builtin.template:
     src: crontasks.j2
-    dest: /home/{{main_user}}/cron.sh
-    owner: "{{main_user}}"
-    group: "{{main_user}}"
+    dest: /home/ansible/cron.sh
+    owner: ansible
+    group: ansible
     mode: 0755
 
 - name: cron | Notify webhook on server reboot
@@ -15,5 +15,5 @@
     name: "Notify webhook on server reboot"
     state: present
     special_time: "reboot"
-    job: "/home/{{main_user}}/cron.sh {{ webhook_url }}"
+    job: "/home/ansible/cron.sh {{ webhook_url }}"
 # curl -X POST -H "Content-Type: application/json" -d "{{lookup("template", "restart.j2")}}"

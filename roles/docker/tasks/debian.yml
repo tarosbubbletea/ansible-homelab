@@ -21,6 +21,17 @@
         repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ansible_distribution_release}} stable
         state: present
 
+    - name: Copy docker settings
+      become: true
+      ansible.builtin.copy:
+        src: /etc/docker/daemon.json
+        dest: /etc/docker/daemon.json
+        owner: root
+        group: root
+        mode: "0644"
+      notify:
+        - start docker
+
     - name: Install docker
       ansible.builtin.apt:
         name: "{{ docker_packages }}"

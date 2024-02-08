@@ -57,5 +57,8 @@
             "folderPath": "ansible/roles/containers/system/authentik/",
             "color": "foldercolorizer.LightSalmon"
         }
-    ]
+    ],
+    "yaml.schemas": {
+        "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json": "file:///home/taro/ansible/roles/containers/system/grafana/tasks/prometheus.yml"
+    }
 }

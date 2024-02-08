@@ -1,0 +1,41 @@
+---
+- name: grafana volume
+  community.docker.docker_volume:
+    volume_name: "grafana_data"
+
+- name: "Grafana"
+  community.docker.docker_container:
+    name: "grafana"
+    hostname: "grafana"
+    image: grafana/grafana:latest
+    pull: true
+    volumes:
+      - "grafana_data:/var/lib/grafana"
+    networks:
+      - name: internal
+      - name: bridge
+    env:
+      GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
+      #admin user
+      GF_SECURITY_ADMIN_USER: "{{ grafana_admin_user }}"
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
+    ports:
+      - "3000:3000"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.grafana.rule: Host(`{{url}}`)
+      traefik.http.routers.grafana.service: "grafana"
+      traefik.http.routers.grafana.entrypoints: web
+      # traefik.http.routers.grafana.middlewares: "authentik@docker"
+      traefik.http.services.grafana.loadbalancer.server.port: "3000"
+    restart_policy: unless-stopped
+    state: started
+
+- name: "[InfluxDB]"
+  include_tasks: influxdb.yml
+- name: "[Telegraf]"
+  include_tasks: telegraf.yml
+- name: "[Prometheus]"
+  include_tasks: prometheus.yml
+- name: "[Speedtest data]"
+  include_tasks: speedtest.yml

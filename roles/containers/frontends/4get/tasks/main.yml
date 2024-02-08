@@ -2,6 +2,9 @@
 - name: "[🔅] 4get volume"
   community.docker.docker_volume:
     volume_name: "fourget"
+- name: "[🔅] 4get apache volume"
+  community.docker.docker_volume:
+    volume_name: "fourget_apache"
 
 - name: "[🔅] 4get"
   community.docker.docker_container:
@@ -12,25 +15,57 @@
     networks:
       - name: internal
     published_ports:
-      - "61201:80"
+      - "80:80" #left port is local only anyway
 
     env:
-      - FOURGET_SERVER_NAME=find.nanachi.store
-      - FOURGET_SERVER_ADMIN_EMAIL="veryillegalusername@gmail.com"
+      FOURGET_VERSION: "6"
+      FOURGET_SERVER_NAME: "{{url}}"
+      FOURGET_SERVER_ADMIN_EMAIL: "bun@nanachi.store"
+      FOURGET_SERVER_SHORT_DESCRIPTION: "Nothing's working out"
+      FOURGET_SERVER_LONG_DESCRIPTION: "https://rentry.co/aGiftFrom_SCHALE"
 
     volumes:
       # - /etc/letsencrypt/live/domain.tld:/etc/4get/certs
-      - fourget/banner:/var/www/html/4get/banner
-      - fourget/captcha:/var/www/html/4get/data/captcha
-      - fourget/icons:/var/www/html/4get/icons
-      - fourget/themes:/var/www/html/4get/static/themes
-      - fourget/favicon.ico:/var/www/html/4get/favicon.ico
-      - fourget/data:/var/www/html/4get/data
+      - fourget:/var/www/html/4get
+      - fourget_apache:/etc/apache2
 
     labels:
-      traefik.enable: true
-      traefik.port: "61201"
-      traefik.http.routers.fourget.rule: "Host(`{{ url }}`)"
+      traefik.enable: "true" #supposed to be a string for some reason???
+      traefik.http.services.fourget.loadbalancer.server.port: "80"
+      traefik.http.routers.fourget.rule: Host(`{{url}}`)
+      traefik.http.routers.fourget.entrypoints: web
 
     restart_policy: unless-stopped
     state: started
+
+- name: copy all files over
+  become: true
+  block:
+    # - name: find banners
+    #   find:
+    #     paths: banners/
+    #     patterns: "*.png"
+    #     use_regex: no
+    #   register: fourget_banners
+    - name: banners
+      copy:
+        src: banners/
+        dest: /var/lib/docker/volumes/fourget/_data/banner/
+        # remote_src: yes
+    - name: favicon
+      copy:
+        src: favicon.ico
+        dest: /var/lib/docker/volumes/fourget/_data/
+    # - name: conf
+    #   template:
+    #     src: config.php.j2
+    #     dest: /var/lib/docker/volumes/fourget/_data/data/
+    # - name: apache conf
+    #   #on every restart it keeps breaking apparently?
+    #   template:
+    #     src: httpd.conf.j2
+    #     dest: /var/lib/docker/volumes/fourget_apache/_data/httpd.conf
+    - name: copy certs #cuz bug in entrypoint forced me to
+      copy:
+        src: /etc/letsencrypt/live/nanachi.store/
+        dest: /var/lib/docker/volumes/fourget/_data/certs/

@@ -1,4 +1,9 @@
 ---
+- name: abort if not running on Debian
+  fail:
+    msg: "This role is only for Debian"
+  when: ansible_distribution != 'Debian'
+
 - name: install stuff
   become: true
   ansible.builtin.apt:

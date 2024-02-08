@@ -4,6 +4,11 @@
     volume_name: "portainer_data"
     state: present
 
+- name: internal network
+  community.general.docker_network:
+    name: internal
+    state: present
+
 - name: "[🏢] Portainer"
   community.docker.docker_container:
     name: "portainer"

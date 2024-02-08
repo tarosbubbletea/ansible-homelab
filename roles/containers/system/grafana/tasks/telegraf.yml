@@ -1,0 +1,32 @@
+---
+- name: volume
+  community.docker.docker_volume:
+    volume_name: "telegraf_data"
+- name: docker container
+  community.docker.docker_container:
+    name: telegraf
+    hostname: telegraf
+    image: telegraf:latest
+    pull: true
+    networks: internal
+    security_opt: "no-new-privileges:true"
+    volumes:
+      - "telegraf_data:/etc/telegraf"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/sys:/rootfs/sys:ro"
+      - "/proc:/rootfs/proc:ro"
+      - "/etc:/rootfs/etc:ro"
+    env:
+      TZ: "America/Santiago"
+      HOST_PROC: "/rootfs/proc"
+      HOST_SYS: "/rootfs/sys"
+      HOST_ETC: "/rootfs/etc"
+    restart_policy: unless-stopped
+    state: started
+# docker exec -it influxdb influx setup
+
+- name: copy conf
+  become: true
+  template:
+    src: telegraf.config.j2
+    dest: /var/lib/docker/volumes/telegraf_data/_data/telegraf.conf

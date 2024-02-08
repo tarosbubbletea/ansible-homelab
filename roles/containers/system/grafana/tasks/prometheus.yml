@@ -1,0 +1,32 @@
+---
+- name: prometheus volume
+  community.docker.docker_volume:
+    volume_name: "prometheus_data"
+- name: "Prometheus"
+  community.docker.docker_container:
+    name: "prometheus"
+    hostname: "prometheus"
+    image: prom/prometheus:latest
+    pull: true
+    volumes:
+      - "prometheus_data:/etc/prometheus"
+    networks:
+      - name: internal
+      - name: bridge
+    # extra_host:
+    #   - "host.docker.internal:host-gateway"
+    ports:
+      - "9090:9090"
+    # labels:
+    #   traefik.enable: "false"
+    #   traefik.http.routers.api.rule: Host(`{{url}}`)
+    #   traefik.http.routers.api.service: "api@internal"
+    #   traefik.http.routers.api.entrypoints: web
+    # traefik.http.routers.api.middlewares: "authentik@docker"
+    restart_policy: unless-stopped
+    state: started
+- name: copy prometheus config
+  become: true
+  template:
+    src: prometheus_config.j2
+    dest: /var/lib/docker/volumes/prometheus_data/_data/prometheus.yml

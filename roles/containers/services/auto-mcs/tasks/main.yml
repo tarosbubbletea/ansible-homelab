@@ -1,0 +1,29 @@
+---
+- name: "[🔅] auto-mcs volume"
+  community.docker.docker_volume:
+    volume_name: "auto-mcs"
+
+- name: "[🔅] auto-mcs"
+  community.docker.docker_container:
+    name: auto-mcs
+    hostname: "{{ container_name }}"
+    image: "ghcr.io/yesbad/auto-mcs:novnc"
+    pull: true
+    networks:
+      - name: internal
+    published_ports:
+      - "1111:80" # 1111 = the port webui is available on
+      - "25565:25565/tcp" # the port for minecraft server (need to add more if you have more yk the deal)
+
+    volumes:
+      - auto-mcs:/home/bad/.auto-mcs/
+
+    # labels:
+    #   traefik.enable: "true" #supposed to be a string for some reason???
+    #   traefik.http.services.neko.loadbalancer.server.port: "8080"
+    #   traefik.http.routers.neko.rule: Host(`{{url}}`)
+    #   traefik.http.routers.neko.entrypoints: web
+    # traefik.http.middlewares.portainer.forwardauth.address: "http://authentik:9000/outpost.goauthentik.io/auth/traefik"
+    # traefik.http.routers.whoami.middlewares: authentik@docker
+    restart_policy: unless-stopped
+    state: started

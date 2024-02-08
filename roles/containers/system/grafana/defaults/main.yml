@@ -1,0 +1,3 @@
+---
+url: "grafana.{{host_tld}}"
+ip: 192.168.1.122

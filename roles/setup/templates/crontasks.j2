@@ -1,2 +1,0 @@
-#!/bin/sh
-curl -X POST -H 'Content-Type: application/json' -d '{"embeds":[{"title": $(hostname),"description": "","color": "3e5087","fields": [],"footer": {"icon_url": "https://i.imgur.com/dcg1OTp.png"},"timestamp": $(date -u +"%Y-%m-%dT%H:%M:%S.%fZ"),"thumbnail": {"url": "https://i.imgur.com/2ZSHVot.png"},"author": {"icon_url": "https://i.imgur.com/37QMCel.png","name": "Notice: "}}]}' $1

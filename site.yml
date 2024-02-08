@@ -3,7 +3,7 @@
   vars:
     #should be able to ssh without login though?
     ansible_user: ansible
-    ansible_password: "{{ansible2_password}}"
+    # ansible_password: "{{ansible2_password}}"
   hosts: all
 
   tasks:

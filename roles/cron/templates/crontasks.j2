@@ -1,0 +1,35 @@
+#!/bin/bash
+
+HOSTNAME=$(hostname)
+CURRENT_DATE=$(date --iso-8601=seconds)
+# Retrieve the last 5 lines from journalctl and escape characters to make it JSON-compatible
+JOURNAL_OUTPUT=$(journalctl -r -n 5 -u systemd-logind | sed ':a;N;$!ba;s/\r//g;s/\n/\\n/g;s/\t/\\t/g;s/"/\\"/g')
+
+json_payload=$(cat <<EOF    
+{
+      "content": "<@!329445869948502026> <@!417817953954824193>",
+      "embeds": [
+      {
+      "title": "${HOSTNAME} has restarted.",
+      "description": "${JOURNAL_OUTPUT}",
+      "color": "4083847",
+      "fields": [],
+      "footer": {
+        "icon_url": "https://i.imgur.com/dcg1OTp.png",
+        "text": ""
+      },
+      "timestamp": "${CURRENT_DATE}",
+      "thumbnail": {
+        "url": "https://i.imgur.com/2ZSHVot.png"
+      },
+      "author": {
+        "icon_url": "https://i.imgur.com/37QMCel.png",
+        "name": "Notice: "
+      }
+    }
+  ]
+}
+EOF
+)
+
+curl -X POST -H 'Content-Type: application/json' -d "$json_payload" $1

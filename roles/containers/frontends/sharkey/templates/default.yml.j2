@@ -6,7 +6,7 @@
 #───┘ URL └─────────────────────────────────────────────────────
 
 # Final accessible URL seen by a user.
-url: { { url } }
+url: "https://nanachi.store"
 
 # ONCE YOU HAVE STARTED THE INSTANCE, DO NOT CHANGE THE
 # URL SETTINGS AFTER THAT!
@@ -41,8 +41,8 @@ db:
   db: misskey
 
   # Auth
-  user: { { POSTGRES_USER } }
-  pass: { { POSTGRES_PASSWORD } }
+  user: {{POSTGRES_USER}}
+  pass: {{POSTGRES_PASSWORD}}
 
   # Whether disable Caching queries
   #disableCache: true

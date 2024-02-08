@@ -47,8 +47,10 @@
       - "80:80"
       - "443:443"
       - "8080:8080"
-    command: "--accesslog=true --api.insecure=true --api.dashboard=true --entrypoints.web.address=:80 --entrypoints.websecure.address=:443 --providers.docker=true --providers.docker.endpoint=unix:///var/run/docker.sock --providers.docker.exposedByDefault=false --providers.docker.network=internal"
+    command: "--accesslog=true --api.insecure=true --api.dashboard=true --entrypoints.web.address=:80 --entrypoints.websecure.address=:443 --providers.docker=true --providers.docker.endpoint=unix:///var/run/docker.sock --providers.docker.exposedByDefault=false --providers.docker.network=internal --certificatesresolvers.cloudflare.acme.dnschallenge=true --certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
     labels:
+      CLOUDFLARE_EMAIL: "{{cloudflare_email}}"
+      CLOUDFLARE_API_KEY: "{{cloudflare_apikey}}"
       traefik.enable: "false"
       traefik.http.routers.api.rule: Host(`{{url}}`)
       traefik.http.routers.api.service: "api@internal"
