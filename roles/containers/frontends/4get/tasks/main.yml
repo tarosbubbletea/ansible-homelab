@@ -20,9 +20,9 @@
     env:
       FOURGET_VERSION: "6"
       FOURGET_SERVER_NAME: "{{url}}"
-      FOURGET_SERVER_ADMIN_EMAIL: "bun@nanachi.store"
+      FOURGET_SERVER_ADMIN_EMAIL: "bun@{{host.tld}}"
       FOURGET_SERVER_SHORT_DESCRIPTION: "Nothing's working out"
-      FOURGET_SERVER_LONG_DESCRIPTION: "https://rentry.co/aGiftFrom_SCHALE"
+      FOURGET_SERVER_LONG_DESCRIPTION: "aHR0cHM6Ly9yZW50cnkuY28vYUdpZnRGcm9tX1NDSEFMRQ=="
 
     volumes:
       # - /etc/letsencrypt/live/domain.tld:/etc/4get/certs
