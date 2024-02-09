@@ -38,5 +38,6 @@
   include_tasks: influxdb.yml
 - name: "[Telegraf]"
   include_tasks: telegraf.yml
-- name: "[Prometheus]"
-  include_tasks: prometheus.yml
+# - name: "[Prometheus]"
+#   include_tasks: prometheus.yml #need cAdvisor/blackbox to truly make use of it
+#time() - container_last_seen{name="CONTAINER_NAME"}

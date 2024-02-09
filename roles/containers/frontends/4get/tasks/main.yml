@@ -1,26 +1,19 @@
 ---
-- name: "[🔅] 4get volume"
-  community.docker.docker_volume:
-    volume_name: "fourget"
-- name: "[🔅] 4get apache volume"
-  community.docker.docker_volume:
-    volume_name: "fourget_apache"
-
 - name: "[🔅] 4get"
   community.docker.docker_container:
     name: 4get
-    hostname: "{ { container_name } }"
-    image: luuul/4get:latest
+    hostname: 4get
+    image: tarobubbletea/4get:latest
     pull: true
     networks:
       - name: internal
     published_ports:
-      - "80:80" #left port is local only anyway
+      - "880:80" #left port is local only anyway
 
     env:
       FOURGET_VERSION: "6"
-      FOURGET_SERVER_NAME: "{{url}}"
-      FOURGET_SERVER_ADMIN_EMAIL: "bun@{{host.tld}}"
+      FOURGET_SERVER_NAME: "bunsearx"
+      FOURGET_SERVER_ADMIN_EMAIL: "bun@{{host_tld}}"
       FOURGET_SERVER_SHORT_DESCRIPTION: "Nothing's working out"
       FOURGET_SERVER_LONG_DESCRIPTION: "aHR0cHM6Ly9yZW50cnkuY28vYUdpZnRGcm9tX1NDSEFMRQ=="
 
@@ -51,7 +44,19 @@
       copy:
         src: banners/
         dest: /var/lib/docker/volumes/fourget/_data/banner/
-        # remote_src: yes
+    - name: delete default banner
+      file:
+        path: /var/lib/docker/volumes/fourget/_data/banner/4get-default.png
+        state: absent
+    - name: copy theme
+      copy:
+        src: spigot.css
+        dest: /var/lib/docker/volumes/fourget/_data/static/themes/spigot.css
+    - name: set theme
+      replace:
+        path: /var/lib/docker/volumes/fourget/_data/data/config.php
+        regexp: 'const DEFAULT_THEME = "(.+)";$'
+        replace: 'const DEFAULT_THEME = "spigot";'
     - name: favicon
       copy:
         src: favicon.ico
@@ -65,7 +70,7 @@
     #   template:
     #     src: httpd.conf.j2
     #     dest: /var/lib/docker/volumes/fourget_apache/_data/httpd.conf
-    - name: copy certs #cuz bug in entrypoint forced me to
-      copy:
-        src: /etc/letsencrypt/live/nanachi.store/
-        dest: /var/lib/docker/volumes/fourget/_data/certs/
+    # - name: copy certs # bug was fixed
+    #   copy:
+    #     src: /etc/letsencrypt/live/nanachi.store/
+    #     dest: /var/lib/docker/volumes/fourget/_data/certs/

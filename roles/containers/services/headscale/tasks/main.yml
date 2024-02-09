@@ -1,24 +1,46 @@
 ---
 - name: "[scale]"
   block:
-    - name: container
-      community.docker.docker_container:
-        name: tailscale
-        hostname: tailscale
-        image: tailscale/tailscale:latest
-        pull: true
-        networks:
-          - name: internal
-        volumes:
-          - "tailscale:/var/lib"
-          - "/dev/net/tun:/dev/net/tun"
-        capabilities: # Required for tailscale to work
-          - "net_admin"
-          - "sys_module"
-        command: tailscaled
-        privileged: true
-        restart_policy: unless-stopped
-        state: started
+    - name: check if we're in arch
+      stat:
+        path: /etc/arch-release
+      register: arch_release
+    - name: "[🔅] arch install"
+      become: true
+      block:
+        - name: pacman
+          community.general.pacman:
+            name:
+              - "tailscale"
+            state: present
+        - name: enable service
+          systemd:
+            name: tailscaled
+            enabled: yes
+            state: started
+      when: arch_release.stat.exists
+    # - name: container
+    #   community.docker.docker_container:
+    #     name: tailscale
+    #     hostname: tailscale
+    #     image: tailscale/tailscale:latest
+    #     pull: true
+    #     networks:
+    #       - name: internal
+    #     volumes:
+    #       - "tailscale:/var/lib"
+    #       - "/dev/net/tun:/dev/net/tun"
+    #     capabilities: # Required for tailscale to work
+    #       - "net_admin"
+    #       - "sys_module"
+    #     env:
+    #       TS_EXTRA_ARGS: "—ssh"
+    #       TS_HOSTNAME: "mocha"
+    #       TS_USERSPACE: "false"
+    #     command: tailscaled
+    #     privileged: true
+    #     restart_policy: unless-stopped
+    #     state: started
     # - name: container
     #   community.docker.docker_container:
     #     name: tailscale

@@ -21,16 +21,22 @@
         repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ansible_distribution_release}} stable
         state: present
 
-    - name: Copy docker settings
-      become: true
-      ansible.builtin.copy:
-        src: /etc/docker/daemon.json
-        dest: /etc/docker/daemon.json
-        owner: root
-        group: root
-        mode: "0644"
-      notify:
-        - start docker
+    # Need to fix:
+    # I don't even make use of the docker API, telegraf doesn't even use it but eats the docker socket raw
+
+    # Uses up too many resources over time, like +200MB per day of uptime (logs get bigger and bigger)
+    # Suggested fix implies limiting log size
+    # https://github.com/docker/for-linux/issues/641#issuecomment-665377103
+    # - name: Copy docker settings
+    #   become: true
+    #   ansible.builtin.copy:
+    #     src: /etc/docker/daemon.json
+    #     dest: /etc/docker/daemon.json
+    #     owner: root
+    #     group: root
+    #     mode: "0644"
+    #   notify:
+    #     - start docker
 
     - name: Install docker
       ansible.builtin.apt:

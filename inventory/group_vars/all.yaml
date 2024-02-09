@@ -36,13 +36,13 @@ default_roles:
   # - containers/system/authentik
 
   # - containers/frontends/nitter #broken as of last twitter update
-  # - containers/frontends/4get #need ssl cert conf
+  - containers/frontends/4get
   # - containers/frontends/sharkey #very very slow with one worker
   - containers/frontends/sillytavern
 
   # - containers/services/neko # Takes a lot of resources, 2GB RAM usage at all times, need to figure this out. it gets stuck
   # - containers/services/auto-mcs # Would rather have a custom docker-compose for MC
-  - containers/services/headscale
+  - containers/services/headscale # Not actually running in a container
 
   # Reverse proxy & Networking
   - containers/system/nginxproxymanager # Manual setup only.

@@ -10,9 +10,9 @@ whitelist:
   - 127.0.0.1
   - 192.168.1.11
   - 192.168.1.122
+  - 172.18.0.1 #docker bridge/gateway
   - nginxproxymanager
   - tailscale
-  - iphone
 # Toggle basic authentication for endpoints
 basicAuthMode: false
 # Basic authentication credentials
