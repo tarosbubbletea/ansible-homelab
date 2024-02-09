@@ -1,0 +1,27 @@
+---
+- name: check if rust-motd is present
+  ansible.builtin.stat:
+    path: /usr/bin/rust-motd
+  register: rust_motd
+
+- name: install rust-motd
+  when: rust_motd.stat.exists == false
+  block:
+    - name: check for debian
+      ansible.builtin.stat:
+      path: /etc/debian_version
+      register: debian
+    - name: install rust-motd
+      #if
+      ansible.builtin.apt:
+        deb: https://github.com/rust-motd/rust-motd/releases/download/v1.0.1/rust-motd_1.0.1_amd64.deb
+        state: present
+      when: debian.stat.exists == true
+      #else
+    - name: don't install rust-motd
+      ansible.builtin.shell: echo "Not a debian system, please install rust-motd manually."
+      when: debian.stat.exists == false
+    - name: copy setting
+      ansible.builtin.copy:
+        src: config.toml
+        dest: /home/{{username}}/.config/rust-motd/config.toml

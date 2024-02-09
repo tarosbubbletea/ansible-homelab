@@ -1,15 +1,17 @@
 ---
-- name: volume
+- name: "[varken] volume"
   community.docker.docker_volume:
     volume_name: "varken_data"
-- name: docker container
+- name: "[varken] docker container"
   community.docker.docker_container:
     name: varken
     hostname: varken
     image: boerderij/varken:latest
     pull: true
-    networks: internal
-    volumes: "varken_data:/config"
+    networks:
+      - name: internal
+    volumes:
+      - "varken_data:/config"
     env:
       TZ: "America/Santiago"
       PUID: "1000"

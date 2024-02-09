@@ -75,3 +75,6 @@
   ansible.builtin.file:
     path: /tmp/omf-install
     state: absent
+
+- name: "[rust-motd]"
+  include_tasks: rust-motd.yml

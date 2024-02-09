@@ -7,7 +7,7 @@
   community.docker.docker_container:
     name: "grafana"
     hostname: "grafana"
-    image: grafana/grafana:latest
+    image: grafana/grafana-enterprise:latest
     pull: true
     volumes:
       - "grafana_data:/var/lib/grafana"
@@ -19,6 +19,9 @@
       #admin user
       GF_SECURITY_ADMIN_USER: "{{ grafana_admin_user }}"
       GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
+      GF_FEATURE_TOGGLES_PUBLICDASHBOARDS: "true"
+      #min refresh interval 1s
+      GF_DASHBOARDS_MIN_REFRESH_INTERVAL: "1s"
     ports:
       - "3000:3000"
     labels:
@@ -37,5 +40,3 @@
   include_tasks: telegraf.yml
 - name: "[Prometheus]"
   include_tasks: prometheus.yml
-- name: "[Speedtest data]"
-  include_tasks: speedtest.yml

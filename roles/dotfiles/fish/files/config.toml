@@ -1,0 +1,15 @@
+[banner]
+color = "white"
+command = "/home/chai/motd.sh"
+
+[uptime]
+prefix = "up and going for"
+
+[filesystems]
+root = "/"
+
+[memory]
+swap_pos = "beside"
+
+[last_login]
+chai = 2

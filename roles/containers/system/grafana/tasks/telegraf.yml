@@ -1,15 +1,23 @@
 ---
-- name: volume
+- name: "[telegraf] Get docker.sock group ID"
+  command: stat -c '%g' /var/run/docker.sock
+  register: docker_sock_gid
+- name: "[telegraf] volume"
   community.docker.docker_volume:
     volume_name: "telegraf_data"
-- name: docker container
+- name: "[telegraf] docker container"
   community.docker.docker_container:
     name: telegraf
     hostname: telegraf
     image: telegraf:latest
     pull: true
-    networks: internal
-    security_opt: "no-new-privileges:true"
+    #some update forced the container to run as user so now we do what we gotta do,,
+    user: "telegraf:{{ docker_sock_gid.stdout }}"
+    networks:
+      - name: internal
+      - name: bridge
+    security_opts:
+      - no-new-privileges:true
     volumes:
       - "telegraf_data:/etc/telegraf"
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -21,12 +29,13 @@
       HOST_PROC: "/rootfs/proc"
       HOST_SYS: "/rootfs/sys"
       HOST_ETC: "/rootfs/etc"
+      #need to get influx_token with the webui
     restart_policy: unless-stopped
     state: started
 # docker exec -it influxdb influx setup
 
-- name: copy conf
+- name: "[telegraf] copy conf"
   become: true
   template:
-    src: telegraf.config.j2
+    src: telegraf.conf.j2
     dest: /var/lib/docker/volumes/telegraf_data/_data/telegraf.conf

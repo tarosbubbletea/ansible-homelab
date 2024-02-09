@@ -1,8 +1,8 @@
 ---
-- name: prometheus volume
+- name: "[prometheus] volume"
   community.docker.docker_volume:
     volume_name: "prometheus_data"
-- name: "Prometheus"
+- name: "[prometheus] docker container"
   community.docker.docker_container:
     name: "prometheus"
     hostname: "prometheus"
