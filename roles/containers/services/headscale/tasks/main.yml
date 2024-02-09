@@ -1,1 +1,58 @@
 ---
+- name: "[scale]"
+  block:
+    - name: container
+      community.docker.docker_container:
+        name: tailscale
+        hostname: tailscale
+        image: tailscale/tailscale:latest
+        pull: true
+        networks:
+          - name: internal
+        volumes:
+          - "tailscale:/var/lib"
+          - "/dev/net/tun:/dev/net/tun"
+        capabilities: # Required for tailscale to work
+          - "net_admin"
+          - "sys_module"
+        command: tailscaled
+        privileged: true
+        restart_policy: unless-stopped
+        state: started
+    # - name: container
+    #   community.docker.docker_container:
+    #     name: tailscale
+    #     hostname: tailscale
+    #     image: headscale:latest
+    #     pull: true
+    #     networks:
+    #       - name: internal
+    #     ports:
+    #       - "8043:8043"
+    #     security_opts:
+    #       - no-new-privileges:true
+    #     volumes:
+    #       - "headscale:/etc/headscale"
+    #       - "headscale_data:/var/lib/headscale"
+    #     env:
+    #       TZ: "America/Santiago"
+    #     command: "headscale serve"
+    #     restart_policy: unless-stopped
+    #     state: started
+
+    # - name: webui
+    #   community.docker.docker_container:
+    #     name: tailscale-webui
+    #     hostname: tailscale-webui
+    #     image: ghcr.io/gurucomputing/headscale-ui:latest
+    #     pull: true
+    #     networks:
+    #       - name: internal
+    #     ports:
+    #       - "8080:8080"
+    #     security_opts:
+    #       - no-new-privileges:true
+    #     env:
+    #       TZ: "America/Santiago"
+    #     restart_policy: unless-stopped
+    #     state: started

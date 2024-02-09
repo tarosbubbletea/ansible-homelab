@@ -13,7 +13,7 @@
     networks:
       - name: internal
     published_ports:
-      # - "8080:8080"
+      - "8080:8080"
       - "52000-52100:52000-52100/udp"
 
     env:
@@ -24,6 +24,7 @@
       NEKO_PASSWORD_ADMIN: "admin"
       NEKO_EPR: "52000-52100"
       NEKO_ICELITE: "1"
+      NEKO_NAT1TO1: "192.168.1.122"
 
     # volumes:
     # - /etc/letsencrypt/live/domain.tld:/etc/4get/certs

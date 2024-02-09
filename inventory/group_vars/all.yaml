@@ -16,28 +16,39 @@ authentik_domain: "{{host_tld}}"
 username: "{{ main_user }}"
 
 default_roles:
+  # Only worth running the first time to be honest
   # - packages-upgrade
   # - packages-misc
   # - setup
+
+  # Terminal customization
   # - dotfiles/fish
-  # - docker
   - cron
+
+  # Important ones
+  # - docker
   - containers/system/grafana
   - containers/system/cloudflare-ddns
   - containers/system/portainer
-  # - containers/system/cloudflared # Super slow.
+
+  # Need to figure out how to get it working, or replace with authelia
   # - containers/system/authentik-db
   # - containers/system/authentik
-  # - containers/system/traefik #cannot get ssl to work on this for the life of me but good for configuring in the ansible files
-  # - containers/system/ddclient
-  - containers/system/nginxproxymanager #manual setup
-  # - containers/frontends/nitter
-  # - containers/frontends/4get #need ssl cert conf
-  # - containers/services/neko
-  # - containers/services/auto-mcs
-  # - containers/services/headscale
 
+  # - containers/frontends/nitter #broken as of last twitter update
+  # - containers/frontends/4get #need ssl cert conf
   # - containers/frontends/sharkey #very very slow with one worker
+  - containers/frontends/sillytavern
+
+  # - containers/services/neko # Takes a lot of resources, 2GB RAM usage at all times, need to figure this out. it gets stuck
+  # - containers/services/auto-mcs # Would rather have a custom docker-compose for MC
+  - containers/services/headscale
+
+  # Reverse proxy & Networking
+  - containers/system/nginxproxymanager # Manual setup only.
+  # - containers/system/traefik # Cannot get SSL to work on this for the life of me, but good for automated config
+  # - containers/system/cloudflared # Super slow, poor routing
+  # - containers/system/ddclient # Broken API, replaced with cloudflare-ddns
 
 # ansible_user: ansible
 

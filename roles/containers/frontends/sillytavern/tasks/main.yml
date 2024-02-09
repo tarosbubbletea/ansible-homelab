@@ -1,0 +1,29 @@
+---
+- name: "[yipee]"
+  block:
+    - name: container
+      community.docker.docker_container:
+        name: sillytavern
+        hostname: sillytavern
+        image: ghcr.io/sillytavern/sillytavern:1.11.3
+        pull: true
+        networks:
+          - name: internal
+        ports:
+          - "65085:65085"
+        security_opts:
+          - no-new-privileges:true
+        volumes:
+          - "st_data_ext:/home/node/app/public/scripts/extensions/third-party"
+          - "st_data:/home/node/app/config"
+          - "st_data_pub:/home/node/app/public/user"
+        env:
+          TZ: "America/Santiago"
+        restart_policy: unless-stopped
+        state: started
+
+    - name: conf
+      become: true
+      copy:
+        src: config.yaml
+        dest: /var/lib/docker/volumes/st_data/_data/config.yaml
