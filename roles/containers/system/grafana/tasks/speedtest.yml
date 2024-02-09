@@ -1,24 +1,11 @@
-# ---
-# - name: "[speedtest] docker container"
-#   community.docker.docker_container:
-#     name: speedtest
-#     hostname: speedtest
-#     image: mbarmem/speedtest-for-influxdb:latest
-#     pull: true
-#     networks:
-#       - name: internal
-#     # volumes:
-#     #   - "speedtest_data:/src"
-#     env:
-#       DB_ADDRESS: "influxdb"
-#       DB_PORT: "8086"
-#       DB_USER: "speedtest"
-#       DB_PASSWORD: "speedtest"
-#       DB_DATABASE: "speedtest"
-#     restart_policy: unless-stopped
-#     state: started
-# # - name: "[speedtest] copy conf"
-# #   become: true
-# #   template:
-# #     src: speedtest.ini.j2
-# #     dest: /var/lib/docker/volumes/speedtest_data/_data/speedtest.ini
+---
+- name: "[speedtest] docker container"
+  community.docker.docker_container:
+    name: speedtest
+    hostname: speedtest
+    image: ghcr.io/danopstech/speedtest_exporter:latest
+    pull: true
+    networks:
+      - name: internal
+    restart_policy: unless-stopped
+    state: started

@@ -1,0 +1,56 @@
+---
+- name: "[prometheus] docker container"
+  community.docker.docker_container:
+    name: "prometheus"
+    hostname: "prometheus"
+    image: prom/prometheus:latest
+    pull: true
+    volumes:
+      - "prometheus_data:/etc/prometheus"
+    networks:
+      - name: internal
+      - name: bridge
+    # extra_host:
+    #   - "host.docker.internal:host-gateway"
+    ports:
+      - "9090:9090"
+    restart_policy: unless-stopped
+    state: started
+
+- name: "[prometheus] copy config"
+  become: true
+  template:
+    src: prometheus_config.j2
+    dest: /var/lib/docker/volumes/prometheus_data/_data/prometheus.yml
+
+  # Replaces InfluxDB
+  # Listens on port 9122, exports on :9122/metrics
+- name: "[prometheus] influxdb_exporter"
+  community.docker.docker_container:
+    name: influxdb
+    hostname: influxdb
+    image: prom/influxdb-exporter:latest
+    pull: true
+    networks:
+      - name: internal
+    restart_policy: unless-stopped
+    state: started
+
+# listens on :8080
+- name: "[prometheus] cloudflare-exporter"
+  community.docker.docker_container:
+    name: cloudflare-exporter
+    hostname: cloudflare-exporter
+    image: ghcr.io/lablabs/cloudflare_exporter:latest
+    pull: true
+    env:
+      # CF_API_KEY: "{{cloudflare_apikey_global}}"
+      # CF_API_EMAIL: "{{cloudflare_email}}"
+      CF_API_TOKEN: "{{cloudflare_api_token_logs}}"
+      CF_ZONES: "{{host_tld}}"
+      FREE_TIER: "true"
+      SCRAPE_DELAY: "400"
+    networks:
+      - name: internal
+    restart_policy: unless-stopped
+    state: started

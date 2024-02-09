@@ -27,10 +27,6 @@ scrape_configs:
     static_configs:
       - targets: ["prometheus:9090"]
 
-  {# - job_name: docker
-    static_configs:
-      - targets: ["192.168.1.122:9323"] #}
-
   - job_name: telegraf
     # metrics_path defaults to '/metrics'
     # scheme defaults to 'http'.
@@ -41,8 +37,32 @@ scrape_configs:
     static_configs:
       - targets: ["cloudflare-exporter:8080"]
 
-  - job_name: speedtest
-    scrape_interval: 30m
-    scrape_timeout:  60s
-    static_configs:
-      - targets: ["speedtest:9090"]
+remote_write:
+  - url: "{{prometheus_remote_write_url}}"
+    basic_auth:
+      username: "{{prometheus_remote_write_user}}"
+      password: "{{prometheus_remote_write_key}}"
+
+  {# write_relabel_configs:
+    # drop specific metrics from remote-write
+  - source_labels: ['__name__']
+    regex: 'go_gc_.*'
+    action: 'drop' #}
+
+
+      {# # keep only specific labels for the kept metrics
+    - regex: '__name__|instance|job|version|branch'
+      action: 'labelkeep'
+
+    - action: 'replace'
+      target_label: 'source'
+      replacement: 'writer-prometheus'
+
+    - source_labels:
+      - '__name__'
+      - 'source'
+      separator: ;
+      regex: '(up);(writer-prometheus)'
+      target_label: 'job'
+      action: 'replace'
+      replacement: '${2}-baz' #}

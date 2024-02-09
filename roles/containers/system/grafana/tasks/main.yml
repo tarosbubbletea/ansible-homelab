@@ -1,8 +1,4 @@
 ---
-- name: grafana volume
-  community.docker.docker_volume:
-    volume_name: "grafana_data"
-
 - name: "Grafana"
   community.docker.docker_container:
     name: "grafana"
@@ -20,8 +16,8 @@
       GF_SECURITY_ADMIN_USER: "{{ grafana_admin_user }}"
       GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
       GF_FEATURE_TOGGLES_PUBLICDASHBOARDS: "true"
-      #min refresh interval 1s
-      GF_DASHBOARDS_MIN_REFRESH_INTERVAL: "1s"
+      #min refresh interval 2s
+      GF_DASHBOARDS_MIN_REFRESH_INTERVAL: "2s"
     ports:
       - "3000:3000"
     labels:
@@ -34,10 +30,12 @@
     restart_policy: unless-stopped
     state: started
 
-- name: "[InfluxDB]"
-  include_tasks: influxdb.yml
+# - name: "[InfluxDB]"
+#   include_tasks: influxdb.yml
 - name: "[Telegraf]"
   include_tasks: telegraf.yml
-# - name: "[Prometheus]"
-#   include_tasks: prometheus.yml #need cAdvisor/blackbox to truly make use of it
+- name: "[Prometheus]"
+  include_tasks: prometheus.yml #need cAdvisor/blackbox to truly make use of it
 #time() - container_last_seen{name="CONTAINER_NAME"}
+- name: "[Speedtest]"
+  include_tasks: speedtest.yml

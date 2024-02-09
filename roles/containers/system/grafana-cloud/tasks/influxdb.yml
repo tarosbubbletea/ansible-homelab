@@ -1,0 +1,27 @@
+---
+- name: "[influx] docker container"
+  community.docker.docker_container:
+    name: influxdb
+    hostname: influxdb
+    image: influxdb:1.8
+    pull: true
+    networks:
+      - name: internal
+    volumes:
+      - "influxdb_data:/var/lib/influxdb"
+    # ports:
+    #   - "8086:8086"
+    #   - "8089:8089/udp"
+    env:
+      TZ: "America/Santiago"
+      INFLUXDB_HTTP_ENABLED: "true"
+      INFLUX_DB: "host"
+    restart_policy: unless-stopped
+    state: started
+# docker exec -it influxdb influx setup
+
+- name: "[influx] copy conf"
+  become: true
+  template:
+    src: influx.conf.j2
+    dest: /var/lib/docker/volumes/influxdb_data/_data/influxdb.conf

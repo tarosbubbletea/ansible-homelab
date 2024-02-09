@@ -59,6 +59,9 @@
         }
     ],
     "yaml.schemas": {
-        "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json": "file:///home/taro/ansible/roles/containers/system/grafana/tasks/prometheus.yml"
+        "https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json": [
+            "file:///home/taro/ansible/roles/containers/system/grafana/tasks/prometheus.yml",
+            "file:///home/taro/ansible/roles/containers/system/grafana-cloud/tasks/prometheus.yml"
+        ]
     }
 }

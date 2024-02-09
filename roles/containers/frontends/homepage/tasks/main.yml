@@ -1,0 +1,42 @@
+---
+- name: "[hp] Get docker.sock group ID"
+  command: stat -c '%g' /var/run/docker.sock
+  register: docker_sock_gid
+- name: "[hp] container"
+  community.docker.docker_container:
+    name: homepage
+    hostname: homepage
+    image: ghcr.io/gethomepage/homepage:latest
+    pull: true
+    volumes:
+      - "homepage_data:/app/config"
+      - "homepage:/app/public"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    user: "root:{{ docker_sock_gid.stdout }}"
+    networks:
+      - name: internal
+      - name: bridge
+    ports:
+      - "3001:3000"
+    restart_policy: unless-stopped
+    state: started
+
+- name: "[hp] copy files to public dir"
+  become: true
+  block:
+    - name: images
+      copy:
+        src: images/
+        dest: /var/lib/docker/volumes/homepage/_data/images/
+    - name: configs
+      template:
+        src: settings.yaml.j2
+        dest: /var/lib/docker/volumes/homepage_data/_data/settings.yaml
+    - name: services
+      template:
+        src: services.yaml.j2
+        dest: /var/lib/docker/volumes/homepage_data/_data/services.yaml
+    - name: bookmarks
+      template:
+        src: bookmarks.yaml.j2
+        dest: /var/lib/docker/volumes/homepage_data/_data/bookmarks.yaml
