@@ -1,0 +1,21 @@
+---
+- name: "[Handbrake] Container"
+  docker_container:
+    name: handbrake
+    hostname: handbrake
+    image: jlesage/handbrake
+    ports:
+      - "5800:5800"
+    env:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "America/Santiago"
+    privileged: true
+    volumes:
+      - /etc/handbrake:/config:rw
+      - /home/{{main_user}}/HandBrake/storage:/storage:ro
+      - /home/{{main_user}}/HandBrake/watch:/watch:rw
+      - /home/{{main_user}}/HandBrake/output:/output:rw
+      - /dev/dri:/dev/dri
+    state: started
+    restart_policy: always

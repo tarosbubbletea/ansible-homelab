@@ -1,0 +1,56 @@
+---
+- name: "[Archive warrior] Watchtower"
+  community.docker.docker_container:
+    name: watchtower
+    hostname: warrior
+    image: containrrr/watchtower
+    restart_policy: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env:
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_POLL_INTERVAL: "3600"
+      WATCHTOWER_LABEL_ENABLE: "true"
+      WATCHTOWER_INCLUDE_RESTARTING: "true"
+      # WATCHTOWER_LABEL_FILTER: "com.centurylinklabs.watchtower.enable=true"
+    state: started
+    pull: true
+    log_driver: json-file
+    log_options:
+      max-size: 10m
+      max-file: "3"
+    # networks:
+    #   - name: internal
+    # labels:
+    #   - "com.centurylinklabs.watchtower.enable=true"
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.watchtower.rule=Host(`watchtower.{{ ansible_domain }}`)"
+    #   - "traefik.http.routers.watchtower.entrypoints=websecure"
+    #   - "traefik.http.routers.watchtower.tls.certresolver=myresolver"
+    #   - "traefik.http.routers.watchtower.service=watchtower"
+    #   - "traefik.http.services.watchtower.load
+
+# need to:
+# implement logs into promtail/grafana.
+# /home/warrior/data/warrior.log
+# regularly check for updates on projects on IRC.
+- name: "[Archive warrior] Container"
+  community.docker.docker_container:
+    name: archiveteam-warrior
+    hostname: archiveteam-warrior
+    image: atdr.meo.ws/archiveteam/warrior-dockerfile
+    restart_policy: unless-stopped
+    volumes:
+      - "archwarrior_data:/home/warrior/data/"
+    ports:
+      - "8001:8001"
+    state: started
+    log_driver: json-file
+    log_options:
+      max-size: 50m
+      max-file: "2"
+    env:
+      DOWNLOADER: "mochantea"
+      SELECTED_PROJECT: "auto"
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"

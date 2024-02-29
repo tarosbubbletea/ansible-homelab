@@ -1,0 +1,22 @@
+---
+- name: "[transmission] container"
+  community.docker.docker_container:
+    name: transmission
+    hostname: transmission
+    image: lscr.io/linuxserver/transmission:latest
+    restart_policy: unless-stopped
+    ports:
+      - "9091:9091"
+      - "51413:51413"
+      - "51413:51413/udp"
+    volumes:
+      - transmission:/config
+      - /opt/transmission/download:/download
+    env:
+      #set to curent user. should be 1000
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "America/Santiago"
+    networks:
+      - name: internal
+    state: started

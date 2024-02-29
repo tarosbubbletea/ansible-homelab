@@ -21,7 +21,6 @@
   ## Environment variables can be used as tags, and throughout the config file
   # user = "$USER"
 
-
 # Configuration for telegraf agent
 [agent]
   ## Default data collection interval for all inputs
@@ -38,7 +37,7 @@
   ## Maximum number of unwritten metrics per output.  Increasing this value
   ## allows for longer periods of output downtime without dropping metrics at the
   ## cost of higher maximum memory usage.
-  metric_buffer_limit = 10000
+  metric_buffer_limit = 1000 # limit mem usage to 90M
 
   ## Collection jitter is used to jitter the collection by a random amount.
   ## Each plugin will sleep for a random time within jitter before collecting.
@@ -184,19 +183,19 @@ listen = ":9273"
 
 
 # Get the number of processes and group them by status
-[[inputs.processes]]
+{# [[inputs.processes]] #}
   # no configuration
 
 
 # Read metrics about swap memory usage
-[[inputs.swap]]
+{# [[inputs.swap]] #}
   # no configuration
 
 
 # Read metrics about system load & uptime
 [[inputs.system]]
   ## Uncomment to remove deprecated metrics.
-  # fielddrop = ["uptime_format"]
+  fielddrop = ["uptime_format"]
 
 
 # # Read metrics about docker containers
@@ -234,18 +233,18 @@ listen = ":9273"
 #   # ignore_protocol_stats = false
 #   ##
 
- [[inputs.internet_speed]]
+  #[[inputs.internet_speed]]
   ## This plugin downloads many MB of data each time it is run. As such
   ## consider setting a higher interval for this plugin to reduce the
   ## demand on your internet connection.
-  {# enable_file_download = false
-  interval = "30m" #}
+  #enable_file_download = false
+  #interval = "30m" 
 
   ## Enable to reduce memory usage
   # memory_saving_mode = false
 
   ## Caches the closest server location
-  cache = false
+  #cache = false 
 
   ## Number of concurrent connections
   ## By default or set to zero, the number of CPU cores is used. Use this to

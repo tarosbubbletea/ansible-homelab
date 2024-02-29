@@ -34,7 +34,7 @@
 
 - name: debug msg
   debug:
-    msg: "---- REMINDER ---- Portainer is running at localhost:9002 but 9000 for exposing it"
+    msg: "---- REMINDER ---- Portainer is running at localhost:9002 but use port 9000 for exposing it in nginx"
 # - name: Check if Portainer admin user already exists
 #   uri:
 #     url: "http://{{url}}:9002/api/users/administrator"

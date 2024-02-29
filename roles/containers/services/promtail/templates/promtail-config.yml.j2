@@ -1,0 +1,28 @@
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: minecraft
+    static_configs:
+      - targets:
+          - minecraft
+        labels:
+          job: minecraft_logs
+          __path__: /var/log/minecraft/logs/*.log
+    pipeline_stages:
+      - regex:
+          expression: .*:\s(?P<player>.*)\sjoined the game$
+      - labels:
+          player:
+  - job_name: archiveteam-warrior
+    static_configs:
+      - targets:
+          - archiveteam-warrior
+        labels:
+          job: warrior_logs
+          __path__: /var/lib/docker/volumes/archwarrior_data/_data/warrior.log
+    {# pipeline_stages:
+      - regex:
+          expression: .*:\s(?P<player>.*)\sjoined the game$
+      - labels:
+          player: #}

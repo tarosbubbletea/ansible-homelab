@@ -6,7 +6,8 @@
   community.docker.docker_container:
     name: homepage
     hostname: homepage
-    image: ghcr.io/gethomepage/homepage:latest
+    #image: ghcr.io/gethomepage/homepage:0.8.7 # errors out a lot, no clue why? it's always this image.
+    image: tarobubbletea/homepage:latest
     pull: true
     volumes:
       - "homepage_data:/app/config"
@@ -23,6 +24,8 @@
 
 - name: "[hp] copy files to public dir"
   become: true
+  notify:
+    - Restart homepage
   block:
     - name: images
       copy:

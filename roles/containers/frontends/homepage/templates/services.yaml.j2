@@ -22,12 +22,6 @@
         href: http://mocha:3000
         description: Monitor activity, stats
         container: grafana
-        widget:
-          hideErrors: true
-          type: grafana
-          url: http://grafana:3000
-          username: "homepage"
-          password: "glsa_e8fjNByfYTOMTY6b9FyXDsCQhJ0cMfUV_9d98efcc"
   - Prometheus:
         icon: si-prometheus
         href: http://mocha:9090
@@ -36,8 +30,14 @@
         widget:
           type: prometheus
           url: http://prometheus:9090
+  - cAdvisor:
+        icon: si-docsdotrs
+        href: http://mocha:8080
+        description: Container monitoring data
+        container: prometheus-cadvisor
 - Services:
     - SillyTavern:
+        icon: /images/st.png
         href: http://mocha:65085
         description: Chat with bots
         container: sillytavern
@@ -47,10 +47,20 @@
         description: Search engine
         container: 4get
 - Media:
-    - Jellyfin:
-        icon: si-jellyfin
-        href: http://mocha:1000
-        description: Media server
+    - Transmission:
+        icon: si-transmission
+        href: http://mocha:9091
+        description: Torrent server
+        container: transmission
+    - Minecraft:
+        icon: si-minetest
+        description: Game server
+        container: minecraft
+    - Handbrake:
+        icon: si-ffmpeg
+        href: http://mocha:5800
+        description: Video encoding
+        container: handbrake
 - Containers:
     - Telegraf:
         icon: si-influxdb
@@ -58,12 +68,15 @@
     - InfluxDB-Exporter:
         icon: si-influxdb
         container: influxdb
+    - Watchtower:
+        icon: si-googlecloudstorage
+        container: watchtower
     - iSponsorBlockTV:
         icon: si-youtube
         container: iSponsorBlockTV
     - CloudflareDDNS:
         icon: si-cloudflare
         container: cloudflare-ddns
-    - Cloudflare-Exporter:
-        icon: si-cloudflare
-        container: cloudflare-exporter
+    - ArchiveWarrior:
+        icon: si-internetarchive
+        container: archiveteam-warrior

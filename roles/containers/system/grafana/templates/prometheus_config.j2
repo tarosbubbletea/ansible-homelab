@@ -26,23 +26,34 @@ scrape_configs:
     # scheme defaults to 'http'.
     static_configs:
       - targets: ["prometheus:9090"]
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'go_.*'
+        action: drop
+    
 
   {# - job_name: docker
     static_configs:
       - targets: ["192.168.1.122:9323"] #}
 
   - job_name: telegraf
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
     static_configs:
       - targets: ["telegraf:9273"]
   
-  - job_name: cloudflare
+  {# - job_name: cloudflare
     static_configs:
-      - targets: ["cloudflare-exporter:8080"]
+      - targets: ["cloudflare-exporter:8080"] #}
 
   - job_name: speedtest
     scrape_interval: 30m
     scrape_timeout:  60s
     static_configs:
       - targets: ["speedtest:9090"]
+
+  - job_name: cadvisor
+    static_configs:
+      - targets: ['prometheus-cadvisor:8080']
+
+  - job_name: minecraft
+    static_configs:
+      - targets: ['minecraft:25585']

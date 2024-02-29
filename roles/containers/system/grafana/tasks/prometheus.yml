@@ -1,7 +1,4 @@
 ---
-- name: "[prometheus] volume"
-  community.docker.docker_volume:
-    volume_name: "prometheus_data"
 - name: "[prometheus] docker container"
   community.docker.docker_container:
     name: "prometheus"
@@ -30,3 +27,22 @@
   template:
     src: prometheus_config.j2
     dest: /var/lib/docker/volumes/prometheus_data/_data/prometheus.yml
+
+- name: "[cadvisor]"
+  community.docker.docker_container:
+    name: "prometheus-cadvisor"
+    hostname: "prometheus-cadvisor"
+    image: gcr.io/cadvisor/cadvisor:latest
+    pull: true
+    networks:
+      - name: internal
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    ports:
+      - "8080:8080"
+    restart_policy: unless-stopped
+    state: started

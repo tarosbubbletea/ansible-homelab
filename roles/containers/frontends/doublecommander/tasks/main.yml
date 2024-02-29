@@ -1,0 +1,17 @@
+---
+- name: "[DC] Container"
+  docker_container:
+    name: doublecommander
+    hostname: doublecommander
+    image: lscr.io/linuxserver/doublecommander:latest
+    ports:
+      - "6100:3000"
+      - "6101:3001"
+    env:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "America/Santiago"
+    volumes:
+      - /home/{{main_user}}/HandBrake:/mnt/HandBrake:rw
+    state: started
+    restart_policy: always

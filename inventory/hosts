@@ -1,2 +1,2 @@
 [nodes]
-node_1 ansible_host=192.168.1.122
+node_1 ansible_host=mocha

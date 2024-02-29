@@ -15,5 +15,25 @@
     name: "Notify webhook on server reboot"
     state: present
     special_time: "reboot"
-    job: "/home/ansible/cron.sh {{ webhook_url }}"
+    job: "sh /home/ansible/cron.sh {{ webhook_url }}"
 # curl -X POST -H "Content-Type: application/json" -d "{{lookup("template", "restart.j2")}}"
+
+# should be getting an email if it doesn't run
+- name: cron | Heartbeat
+  become: true
+  become_user: root
+  ansible.builtin.cron:
+    name: "Heartbeat"
+    state: present
+    minute: "*/30"
+    job: "curl {{healthcheck_url}}"
+
+- name: cron | restart speedtest container
+  become: true
+  become_user: root
+  ansible.builtin.cron:
+    name: "restart speedtest container"
+    state: present
+    minute: "0"
+    hour: "*/2"
+    job: "docker restart speedtest"

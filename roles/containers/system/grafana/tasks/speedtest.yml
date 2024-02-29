@@ -9,3 +9,9 @@
       - name: internal
     restart_policy: unless-stopped
     state: started
+- name: "[speedtest] cron restart"
+  cron:
+    name: "speedtest"
+    hour: "*/4"
+    job: "docker restart speedtest"
+    state: present

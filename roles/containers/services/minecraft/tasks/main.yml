@@ -1,0 +1,23 @@
+---
+- name: "[Minecraft] container"
+  # doesnt run as root? need to fix perms later
+  community.docker.docker_container:
+    name: minecraft
+    hostname: minecraft
+    image: itzg/minecraft-server:latest
+    restart_policy: unless-stopped
+    ports:
+      - "25565:25565"
+    volumes:
+      - minecraft_data:/data
+    networks:
+      - name: internal
+    env:
+      EULA: "TRUE"
+      TYPE: "FABRIC"
+      MEMORY: "4G"
+      VERSION: "1.20.1"
+    interactive: true #stdin_open
+    tty: true
+    state: stopped
+    # state: started

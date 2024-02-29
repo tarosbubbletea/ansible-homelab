@@ -34,7 +34,7 @@ body {
   top: 20px;
   left: 0;
   position: fixed;
-  content: "this shit is super slow cause the ethernet drivers for alder lake are broken on linux so the server is running on wifi lmao (pls forgive me)";
+  content: "this shit can be slow cause the ethernet drivers for alder lake are broken on linux so the server is running on wifi for now until i get a replacement (pls forgive me)";
   overflow: hidden;
   white-space: nowrap;
   text-align: center;

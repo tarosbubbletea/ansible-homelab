@@ -16,7 +16,7 @@ authentik_domain: "{{host_tld}}"
 username: "{{ main_user }}"
 
 default_roles:
-  # Only worth running the first time to be honest
+  # Only worth running the first time
   # - packages-upgrade
   # - packages-misc
   # - setup
@@ -28,40 +28,51 @@ default_roles:
   # Important ones
   # - docker
   - containers/system/grafana
-  # - containers/system/grafana-cloud # Cloud refreshes too slowly, internet speed metering is broken. Public dashboards are broken there too.
+  - containers/services/promtail
+  # - containers/system/grafana-cloud # refreshes too slowly, internet speed metering is broken. Public dashboards are broken there too so no point in changing over.
   - containers/system/cloudflare-ddns
   - containers/system/portainer
 
-  # Need to figure out how to get it working, or replace with authelia
-  # - containers/system/authentik-db
-  # - containers/system/authentik
-
-  # - containers/frontends/nitter #broken as of last twitter update
+  # - containers/frontends/nitter #broken as of the last twitter update
   - containers/frontends/4get
-  # - containers/frontends/sharkey #very very slow with one worker
+  # - containers/frontends/sharkey #very very slow with one worker, need to figure this out with k8s later when I actually have money
   - containers/frontends/sillytavern
-  - containers/frontends/homepage
+  - containers/frontends/homepage # Breaks really often, need to replace with dashy.to
+  # - containers/frontends/doublecommander # just use winscp
+  # - containers/frontends/handbrake # just use ffmpeg over ssh
 
-  # - containers/services/neko # Takes a lot of resources, 2GB RAM usage at all times, need to figure this out. it gets stuck
-  # - containers/services/auto-mcs # Would rather have a custom docker-compose for MC
-  # - containers/services/home-assistant # Useless compared to the OS
+  # - containers/services/home-assistant # Useless compared to the official OS/distro
+  # - containers/services/neko # Takes a lot of resources, 2GB RAM usage at all times, need to figure this out. it doesn't even load.
+  # - containers/services/auto-mcs # Would rather my own custom docker-compose.yml for MC
+  # - containers/services/minecraft
   - containers/services/headscale # Not actually running in a container
+  - containers/services/transmission # Should be usable through Tailscale
+  - containers/services/warrior # need to wipe container every once in a while
 
   # Reverse proxy & Networking
-  - containers/system/nginxproxymanager # Manual setup only.
+  - containers/system/authentik
+  - containers/system/nginxproxymanager # Manual setup only. Not idempotent.
   # - containers/system/traefik # Cannot get SSL to work on this for the life of me, but good for automated config
-  # - containers/system/cloudflared # Super slow, poor routing
+  # - containers/system/cloudflared # Super slow, poor routing? Might need to give it another try.
   # - containers/system/ddclient # Broken API, replaced with cloudflare-ddns
 
 # ansible_user: ansible
 
 cloudflare_domains:
   nanachi.store: null
-  portainer.nanachi.store: null
   find.nanachi.store: null
+  authentik.nanachi.store: null
+  st.nanachi.store: null
 
-authentik_pg_pass: authentik
-authentik_hostname: "authentik.{{host_tld}}"
+healthcheck_url: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  61343638306561643933323030613162323437626134636165353666646133386631333837323731
+  3032336663656337346363383730363135636538623139660a383533393666666566303763353035
+  31643963633437633766636463663063313434636666353535363533353837633039383633323635
+  3363353665626662320a386339633730636531663430613235316133353466623931623037343733
+  31333134326362636565343731336632666430666132346266343534316439653462623736666237
+  65363934643866316361646666653539633239636665363865363037626231366331383230376261
+  303865636235396565666530333434363935
 
 prometheus_remote_write_url: !vault |
   $ANSIBLE_VAULT;1.1;AES256
@@ -170,6 +181,15 @@ authentik_secret_key: !vault |
   6461386337653830660a303862666634663439353762626434653263353339353664626666366366
   31363366333534613738323662343261376231666364623865666633303763383636333936626264
   3631353033356330663964303239346463656366396639643535
+
+authentik_pg_pass: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  64316438643434383735643466653133373066346166373062666264633462333034616464363238
+  6431316665666432333439376439363636653034623966610a316536323234383963373432333235
+  30616133623336343137356634353130363135366636316333353539613765323434373638646539
+  3033643064383663310a393665313636326262303764633236383864373763323165353535633762
+  61656261333136343437313838613338373439393730633765626636383433376263393136643063
+  3566343362306266623930666561313464643731646137653430
 
 authentik_bootstrap_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256
