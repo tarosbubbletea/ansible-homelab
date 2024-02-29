@@ -1,4 +1,4 @@
 # ansible-homelab
 Personal ansible roles managing my home server. Work in progress.
 
-![_5f6TgyLM60](https://github.com/tarosbubbletea/ansible-homelab/assets/6438425/b5ebed9f-17a3-4c23-889a-261002e1fbe8)
+![image](https://github.com/tarosbubbletea/ansible-homelab/assets/6438425/bdb25bf8-0dc7-47da-9374-cae6a4d2ee5a)
